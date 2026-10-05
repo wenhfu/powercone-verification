@@ -19,8 +19,9 @@ What is verified here
 * The exact factorisation of Disc_xi d_{e,t}, symbolically in (u,s), against
   the right-hand side above.
 
-This is the most expensive computation of the suite (about 1.5 minutes); the
-cheap exact spot-check in appendix_a.py refers here for the full identity.
+This is the most expensive computation of the suite (about 1.5 minutes), and
+the only place where the identity itself is checked: appendix_a.py verifies
+the coefficients Pi_1, Pi_2 of the two factors, not the identity.
 
 Run:  python checks/sec4_4_1.py
 """
@@ -35,7 +36,7 @@ banner('subsection 4.4.1', 'eq:discd')
 res = sp.resultant(sp.Poly(d, xi), sp.Poly(sp.diff(d, xi), xi))
 disc_et = sp.expand(sp.discriminant(sp.Poly(d, xi)))
 check("eq:discd   Disc_xi d_{e,t} = -Res_xi(d, d')/[xi^6]d_{e,t}",
-      sp.simplify(sp.expand(res + disc_et*leading)) == 0)
+      is_zero(res + disc_et*leading))
 print()
 
 # Rewrite the discriminant in the variables u = e^2, s = t^2 (every monomial is

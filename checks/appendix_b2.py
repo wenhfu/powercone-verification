@@ -37,7 +37,7 @@ rhs1 = sp.expand(27*h1 + 6450327560*q**4 + 12966173284*q**5 + 12808009492*q**6
                  + 6652881036*q**7 + 1866026592*q**8 + 291453120*q**9)
 show_coeffs("2^18*Pi_2(1/4,1-q)", lhs1, q)
 show_coeffs("h_1(q)", h1, q)
-check("eq:pi2quarter   decomposition for u = 1/4", sp.simplify(lhs1 - rhs1) == 0)
+check("eq:pi2quarter   decomposition for u = 1/4", is_zero(lhs1 - rhs1))
 # eq:disch1 and the positivity of h_1 on q >= 0.
 print("Disc h_1 =", sp.discriminant(sp.Poly(h1, q)))
 check("eq:disch1   Disc h_1", sp.discriminant(sp.Poly(h1, q)) == -133708464211246463833953147)
@@ -53,7 +53,7 @@ rhs2 = sp.expand(27*h2 + 54014298552*q**4 + 69669314028*q**5 + 25199957628*q**6
                  + 3569396868*q**7 + 234936288*q**8 + 9142848*q**9)
 show_coeffs("2^18*Pi_2(3/4,1-q)", lhs2, q)
 show_coeffs("h_2(q)", h2, q)
-check("eq:pi2threequarter   decomposition for u = 3/4", sp.simplify(lhs2 - rhs2) == 0)
+check("eq:pi2threequarter   decomposition for u = 3/4", is_zero(lhs2 - rhs2))
 print("Disc h_2 =", sp.discriminant(sp.Poly(h2, q)))
 check("eq:disch2   Disc h_2", sp.discriminant(sp.Poly(h2, q)) == -1772210425734147611691)
 check("Appendix B.2   h_2: Disc<0, LC>0, h_2(0)=361>0  =>  h_2(q)>0 for q>=0",
@@ -72,11 +72,11 @@ show_coeffs("R_7(s)", R7, s)
 show_coeffs("-R_7(1-q) recomputed from Pi_2(1/2,s)",
             sp.expand(-R7_rec.subs(s, 1 - q)), q)
 check("eq:pi2half   Pi_2(1/2,s) = -((2s-7)^2/512) R_7(s)",
-      sp.simplify(pi2_half + sp.Rational(1, 512)*(2*s - 7)**2*R7) == 0)
+      is_zero(pi2_half + sp.Rational(1, 512)*(2*s - 7)**2*R7))
 check("eq:R7q   -R_7(1-q) = h_0(q) + positive higher-order terms",
-      sp.simplify(sp.expand(-R7_rec.subs(s, 1 - q))
-                  - sp.expand(h0 + 1359652*q**4 + 1485064*q**5
-                              + 268996*q**6 + 38692*q**7)) == 0)
+      is_zero(sp.expand(-R7_rec.subs(s, 1 - q))
+              - sp.expand(h0 + 1359652*q**4 + 1485064*q**5
+                          + 268996*q**6 + 38692*q**7)))
 show_coeffs("h_0(q)", h0, q)
 print("Disc h_0 =", sp.discriminant(sp.Poly(h0, q)))
 check("eq:disch0   Disc h_0", sp.discriminant(sp.Poly(h0, q)) == -188304545926875)

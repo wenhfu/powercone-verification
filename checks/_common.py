@@ -1,22 +1,33 @@
 ﻿# -*- coding: utf-8 -*-
 """
-Shared infrastructure for the symbolic verification of
+Shared infrastructure for the symbolic verification of the upper-bound
+algebra of
 
-    "The optimal self-concordant barrier parameter of the
-     three-dimensional power cone"
+    "The optimal barrier parameter of the three-dimensional power cone"
 
-Every claim of the paper that is algebraic in nature is checked here with
-exact (rational / algebraic) arithmetic in SymPy.
+(subsection 4.3, subsection 4.4 and Appendices A-C).
+
+What is checked here are the algebraic claims of that scope: identities,
+factorisations and sign certificates.  The steps of the proof that are not
+algebraic -- the real-root continuation of lem:root-continuation and
+lem:compactcontinuation, the Sylvester step of lem:Qpd, and the passage from
+an identity to a sign statement -- remain the paper's own arguments.
+Everything is computed in exact (rational / polynomial) arithmetic, and every
+equality verdict is decided by exact normalisation (see ``is_zero``), never
+by a heuristic simplification.
 
 What this module provides
 -------------------------
 * Verdict tracking  : ``check``, ``silent``, ``banner``, ``reset_marks``,
                       ``report``.
+* Exact decisions   : ``is_zero``, the zero test behind every equality
+                      verdict, and ``clear_denominator``, an exact and
+                      remainder-checked division.
 * Text output       : ``show_coeffs``, ``show_factors``, ``num_factor_str``,
                       ``pat`` (plain text; polynomials are never rendered with
                       multi-line ``pprint``).
-* Exact / interval  : ``primitive_int``, ``roots_in_unit``, ``bernstein_1d``,
-                      ``bernstein_box_max`` (used for the sign certificates).
+* Exact / interval  : ``primitive_int``, ``roots_in_unit``, ``bernstein_1d``
+                      (used for the sign certificates).
 * The symbols, the barrier ``f_e`` of eq:fdef, and all quantities derived from
   it, together with the explicit factors ``Pi_1``, ``Pi_2`` of Appendix A and
   the auxiliary polynomials of Appendix B.
@@ -195,6 +206,39 @@ def pat(v):
 # ----------------------------------------------------------------------
 # Exact / interval helpers
 # ----------------------------------------------------------------------
+def is_zero(expr):
+    """True iff ``expr`` is identically zero: an exact decision procedure.
+
+    The expression is first put over a common denominator (``sp.cancel``) and
+    its numerator is then expanded, so the verdict follows from polynomial
+    normalisation.  ``sp.simplify`` is never used as a criterion: it is a
+    heuristic that tries to produce a simpler expression and can fail to prove
+    an identity that actually holds.
+    """
+    num, den = sp.fraction(sp.cancel(expr))
+    if sp.expand(den) == 0:
+        raise ZeroDivisionError("is_zero(): vanishing denominator")
+    return sp.expand(num) == 0
+
+
+def clear_denominator(expr, *vars):
+    """Exact quotient of a rational expression by its own denominator.
+
+    ``expr`` is combined over one denominator and the numerator is divided by
+    it in the polynomial ring ``Q[vars]``.  The remainder is checked to vanish,
+    so the division is a proof that the denominator divides the numerator and
+    the result is a genuine polynomial -- this is how the positive normalising
+    factors of eq:GQ and eq:CP are cleared, with exact arithmetic instead of a
+    heuristic simplification.
+    """
+    num, den = sp.fraction(sp.together(expr))
+    q, rem = sp.div(sp.Poly(sp.expand(num), *vars),
+                    sp.Poly(sp.expand(den), *vars))
+    if not rem.is_zero:
+        raise ArithmeticError("the denominator does not divide the numerator")
+    return sp.expand(q.as_expr())
+
+
 def _lcm(seq):
     seq = list(seq)
     return seq[0] if len(seq) == 1 else sp.ilcm(*seq)
@@ -223,7 +267,12 @@ def primitive_int(g, var):
 
 
 def roots_in_unit(p_expr, u_val):
-    """Exact number of roots of ``p_expr(u_val, s)`` in the open interval (0,1)."""
+    """Exact number of roots of ``p_expr(u_val, s)`` on the interval [0,1].
+
+    ``sp.Poly.count_roots(0, 1)`` counts the endpoints as well, so a count of 0
+    certifies that the polynomial has no root anywhere in [0,1] -- stronger
+    than the count on (0,1) that subsection 4.4.3 quotes.
+    """
     return sp.Poly(sp.expand(p_expr.subs(u, u_val)), s).count_roots(0, 1)
 
 
@@ -238,33 +287,6 @@ def bernstein_1d(p_expr, var, lo, hi, m):
     Qv = sp.Poly(sp.expand(p_expr.subs(var, lo + (hi - lo)*v)), v)
     return [sp.expand(sum(Qv.coeff_monomial(v**k)*sp.Rational(comb(i, k), comb(m, k))
                          for k in range(i + 1))) for i in range(m + 1)]
-
-
-def bernstein_box_max(p_expr, du, ds, u1, u2, s1, s2):
-    """Largest Bernstein coefficient of ``p_expr`` over ``[u1,u2] x [s1,s2]``.
-
-    ``du`` and ``ds`` are the degrees in ``u`` and ``s``.  If the returned
-    maximum is < 0 then the polynomial is < 0 on the whole box.  No script
-    uses this any more -- the sign of Pi_1 is now settled by the tensor
-    identity of subsection 4.4.2 and the sign of Pi_2 by the Bernstein
-    certificates of sec4_4_3.py -- but it is kept as a reusable helper.
-    """
-    v, w = sp.symbols("v w")
-    Qv = sp.Poly(sp.expand(p_expr.subs({u: u1 + (u2 - u1)*v,
-                                        s: s1 + (s2 - s1)*w})), v, w)
-    mx = None
-    for i in range(du + 1):
-        for j in range(ds + 1):
-            tot = 0
-            for kk in range(i + 1):
-                for ll in range(j + 1):
-                    tot += (Qv.coeff_monomial(v**kk*w**ll)
-                            * sp.Rational(comb(i, kk), comb(du, kk))
-                            * sp.Rational(comb(j, ll), comb(ds, ll)))
-            tot = sp.expand(tot)
-            if mx is None or tot > mx:
-                mx = tot
-    return mx
 
 
 # ----------------------------------------------------------------------
@@ -307,9 +329,13 @@ Ghh = (fxx - fx**2)*hX**2 + 2*(fxz - fx*fz)*hX*hZ + (fzz - fz**2)*hZ**2
 Tfff = D3f - 6*D2f*Df + 4*Df**3
 
 # Closed forms of eq:Q and eq:P, obtained from G[h,h] and T_f[h,h,h] on the
-# slice (X,Z) = (1,t) after clearing the positive normalising factors.
-Q_der = sp.simplify(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2))
-P_der = sp.simplify(Tfff.subs({X: 1, Z: t})*(-54*A**3*(1-t**2)**3/(e*(9-e**2))))
+# slice (X,Z) = (1,t) after clearing the positive normalising factors.  The
+# clearing is an exact, remainder-checked polynomial division (never
+# sp.simplify), so Q_der and P_der are the genuine polynomials of eq:Q / eq:P.
+Q_der = clear_denominator(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2),
+                          e, t, p, r)
+P_der = clear_denominator(Tfff.subs({X: 1, Z: t})
+                          * (-54*A**3*(1-t**2)**3/(e*(9-e**2))), e, t, p, r)
 
 # Univariate specialisation p = 1, r = xi, and the polynomial
 # d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 whose discriminant drives the proof.
@@ -358,10 +384,6 @@ Pi2 = sp.expand(sum(b[j]*s**j for j in range(10)))
 A6 = 1612*u**6 - 7822*u**5 + 35755*u**4 - 62928*u**3 + 62694*u**2 - 18954*u + 2187
 A7 = (46301*u**7 - 430305*u**6 + 715218*u**5 + 2010910*u**4
       - 7240815*u**3 + 31031667*u**2 - 12772080*u + 1679616)
-# B1 is the irreducible factor of Disc_s Pi_1 quoted in subsection 4.4.2.
-# Subsection 4.4.2 is verified through the tensor identities in sec4_4_2.py,
-# so B1 itself is not used by any script and is kept for reference only.
-B1 = 229*u**4 - 638*u**3 + 2461*u**2 + 1548*u - 1296
 # R_7 and the three cubics h_0, h_1, h_2 of the base-point checks (Appendix B.2);
 # q = 1 - s is the variable in which h_0, h_1, h_2 are written.
 R7 = (38692*s**7 - 539840*s**6 + 3911572*s**5 - 14174132*s**4

@@ -58,10 +58,10 @@ P_pap = (A**3*(1-t**2)**3*p**3
 #     T_f[h,h,h] = D^3 f[h,h,h] - 6 D^2 f[h,h] <grad f,h> + 4 <grad f,h>^3,
 # evaluated on the slice (X,Z) = (1,t) and cleared of positive factors.
 show_factor_coeffs("Q(p,r) recomputed from G[h,h] of f_e", Q_der, p, r)
-check("eq:Q   Q(p,r)", sp.simplify(sp.expand(Q_der - Q_pap)) == 0)
+check("eq:Q   Q(p,r)", is_zero(Q_der - Q_pap))
 print()
 show_factor_coeffs("P(p,r) recomputed from T_f[h,h,h] of f_e", P_der, p, r)
-check("eq:P   P(p,r)", sp.simplify(sp.expand(P_der - P_pap)) == 0)
+check("eq:P   P(p,r)", is_zero(P_der - P_pap))
 print()
 
 report("subsection 4.3")

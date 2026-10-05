@@ -29,10 +29,15 @@ What is verified here
 ---------------------
 * eq:detM         : det M = 12 (1-s)(u+3) R(u,s), with
                     R(u,s) = (u+3)^2 - 4u(u+3)s + 4u(1-u)s^2.  This is where
-                    R comes from; by Lemma lem:Qpd it is positive on (0,1)^2.
+                    R comes from.
+* Lemma lem:Qpd    : the sign analysis that the paper gives for R:  M_22 > 0,
+                    dR/ds <= -4u(3u+1) < 0 on [0,1], R(u,1) = (1-u)(7u+9) > 0,
+                    hence R(u,s) > 0 and det M > 0, so M is positive definite.
 * eq:tensor-trace : H is M-traceless, M^{jk} H_ijk = 0, as constructed.
 * eq:H111         : H_111 = A^3 (1-s)^3.
 * eq:Hnormidentity: ||H||_M^2 = -Pi_1(u,s)/R(u,s)^3.
+* eq:pi1negative  : Pi_1(u,s) < 0 for 0<u,s<1, the paper's conclusion, from
+                    H != 0, ||H||_M^2 > 0 (M positive definite) and R > 0.
 
 How M^{-1} is handled
 ---------------------
@@ -70,7 +75,7 @@ Run:  python checks/sec4_4_2.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.2', 'eq:detM, eq:tensor-trace, eq:Htensor, eq:Hnormidentity, eq:H111')
+banner('subsection 4.4.2', 'eq:detM, eq:tensor-trace, eq:H111, eq:Hnormidentity, eq:pi1negative')
 
 # w stands for the product e*t; see the module docstring.
 w = sp.Symbol("w", positive=True)
@@ -183,6 +188,41 @@ show_factors("Pi_1(u,s) = -N/(cc^3 det(M)^2)   [= ||H||_M^2 * (-R^3)]",
              sp.cancel(-N/(cc**3*D**2)))
 check("eq:Hnormidentity   ||H||_M^2 = -Pi_1(u,s)/R(u,s)^3",
       sp.expand(N + Pi1*cc**3*D**2) == 0)
+print()
+
+# ----------------------------------------------------------------------
+# Lemma lem:Qpd (positive definiteness of Q) and eq:pi1negative.
+#
+# The identity above turns into a statement about the sign of Pi_1 only once
+# R(u,s) > 0 and the M-inner product is known to be positive definite; both
+# come from Lemma lem:Qpd, whose proof is reproduced here exactly.
+# ----------------------------------------------------------------------
+dR = sp.diff(R, s)
+print("M_22    =", sp.factor(M[1, 1]))
+print("dR/ds   =", sp.expand(dR))
+print("R(u,1)  =", sp.factor(R.subs(s, 1)))
+check("lem:Qpd   M_22 = 4(4us+3u+9) > 0",
+      sp.expand(M[1, 1] - 4*(4*u*s + 3*u + 9)) == 0)
+check("lem:Qpd   dR/ds = -4u(3u+1) - 8u(1-u)(1-s)",
+      sp.expand(dR + 4*u*(3*u + 1) + 8*u*(1 - u)*(1 - s)) == 0)
+check("lem:Qpd   R(u,1) = (1-u)(7u+9)",
+      sp.expand(R.subs(s, 1) - (1 - u)*(7*u + 9)) == 0)
+# Those three facts give dR/ds <= -4u(3u+1) < 0 on 0<=s<=1 and
+# R(u,s) >= R(u,1) = (1-u)(7u+9) > 0 for 0<u<1; together with the identity of
+# eq:detM this is det M > 0, and with M_22 > 0 the matrix M is positive
+# definite -- the content of Lemma lem:Qpd.
+qpd = (sp.expand(M[1, 1] - 4*(4*u*s + 3*u + 9)) == 0
+       and sp.expand(dR + 4*u*(3*u + 1) + 8*u*(1 - u)*(1 - s)) == 0
+       and sp.expand(R.subs(s, 1) - (1 - u)*(7*u + 9)) == 0
+       and sp.expand(D - cc*R) == 0)
+check("lem:Qpd   R(u,s) > 0 and det M > 0  =>  M is positive definite", qpd)
+print()
+
+# eq:pi1negative: H != 0, because H_111 = A^3(1-s)^3 does not vanish for
+# 0<s<1, and the M-inner product is positive definite, so ||H||_M^2 > 0.
+# Since R(u,s) > 0, the identity ||H||_M^2 = -Pi_1/R^3 forces Pi_1 < 0.
+check("eq:pi1negative   Pi_1(u,s) < 0 for 0<u,s<1   (||H||_M^2 > 0, R(u,s) > 0)",
+      qpd and sp.expand(G(1, 1, 1) - D*(u+3)**3*(1 - s)**3) == 0)
 print()
 
 report("subsection 4.4.2")
