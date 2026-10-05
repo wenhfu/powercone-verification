@@ -22,7 +22,7 @@ What is verified here
   coefficients of R_7(s), the coefficients of -R_7(1-q) and of its cubic part
   h_0(q), and the corresponding discriminant argument.
 
-Run:  python appendix_b2.py
+Run:  python checks/appendix_b2.py
 """
 from _common import *
 

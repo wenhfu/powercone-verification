@@ -31,7 +31,7 @@ exactly at four rational points (e,t), which keeps this script fast while
 still being an exact check.  Both sides of the comparison are evaluated with
 exact rational arithmetic, so no numerical tolerance is involved.
 
-Run:  python appendix_a.py
+Run:  python checks/appendix_a.py
 """
 from _common import *
 

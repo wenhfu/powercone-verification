@@ -3,15 +3,16 @@
 Run the whole verification suite, in the order in which the material appears
 in the paper.
 
-A single script prints every value it computes together with the verdict for
-each labelled statement of the paper.  This driver is quiet: it runs each
-script with its output captured and prints only the per-part summary, so the
-whole suite can be checked at a glance.  Nothing is hidden by this, because
-only the printed details are discarded, never the verdict.
+The individual checks live in the ``checks`` folder.  A single check prints
+every value it computes together with the verdict for each labelled statement
+of the paper.  This driver is quiet: it runs each check with its output
+captured and prints only the per-part summary, so the whole suite can be
+checked at a glance.  Nothing is hidden by this, because only the printed
+details are discarded, never the verdict.
 
-For the detailed report of one part, run that script directly, e.g.
+For the detailed report of one part, run that check directly, e.g.
 
-    python sec4_4_4.py
+    python checks/sec4_4_4.py
 
 Run:  python run_all.py
 """
@@ -21,16 +22,20 @@ import os
 import runpy
 import sys
 
-# Paper order.
+# Folder holding the individual checks, and the order in which the parts of the
+# paper are checked.
+CHECKS = "checks"
 FILES = ["appendix_a.py", "appendix_b1.py", "appendix_b2.py", "appendix_c.py",
          "sec4_3.py", "sec4_4_0.py", "sec4_4_1.py", "sec4_4_2.py",
          "sec4_4_3.py", "sec4_4_4.py"]
 
-# Run each script as if it had been started from this directory, so that the
-# shared module _common is importable.
+# Make the shared module _common importable both from here and from the checks
+# folder, so each check also runs on its own:  python checks/sec4_4_4.py
 here = os.path.dirname(os.path.abspath(__file__))
-if here not in sys.path:
-    sys.path.insert(0, here)
+checks_dir = os.path.join(here, CHECKS)
+for d in (here, checks_dir):
+    if d not in sys.path:
+        sys.path.insert(0, d)
 
 print("#" * 72)
 print("# running all verification scripts")
@@ -42,7 +47,7 @@ for name in FILES:
     # Capture the detailed report and keep only the summary lines.
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        runpy.run_path(os.path.join(here, name), run_name="__main__")
+        runpy.run_path(os.path.join(checks_dir, name), run_name="__main__")
     if _common is None:
         _common = sys.modules["_common"]
     # Accumulate the per-section tally recorded by _common.report().

@@ -20,7 +20,7 @@ What is verified here
 Every coefficient is printed in factored form so that it can be compared with
 the compact factors used in the paper.
 
-Run:  python sec4_3.py
+Run:  python checks/sec4_3.py
 """
 from _common import *
 

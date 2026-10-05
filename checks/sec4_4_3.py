@@ -20,7 +20,7 @@ What is verified here
                    root counts of Pi_2(u0,.) on (0,1) for u0 = 1/4, 1/2, 3/4
                    and by the Bernstein certificates for A_6, A_7 above.
 
-Run:  python sec4_4_3.py
+Run:  python checks/sec4_4_3.py
 """
 from _common import *
 

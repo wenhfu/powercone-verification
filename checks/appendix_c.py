@@ -19,7 +19,7 @@ What is verified here
   root -- so d_0 is strictly positive (d_0(0) = 66199 > 0).
 * The same conclusion, independently, from an exact root count.
 
-Run:  python appendix_c.py
+Run:  python checks/appendix_c.py
 """
 from _common import *
 

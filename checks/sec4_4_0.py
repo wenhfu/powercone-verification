@@ -25,7 +25,7 @@ What is verified here
 * eq:Lpositive       : all those Bernstein coefficients are >= 0, which
                        certifies L(u,s) >= 0 on [0,1]^2.
 
-Run:  python sec4_4_0.py
+Run:  python checks/sec4_4_0.py
 """
 from _common import *
 

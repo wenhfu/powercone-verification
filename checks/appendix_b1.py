@@ -20,7 +20,7 @@ What is verified here
 The half-interval split at 1/2 is used because 2u-1 enters the discriminant of
 Pi_2 as a factor; the two halves are handled separately.
 
-Run:  python appendix_b1.py
+Run:  python checks/appendix_b1.py
 """
 from _common import *
 

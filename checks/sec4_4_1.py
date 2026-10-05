@@ -22,7 +22,7 @@ What is verified here
 This is the most expensive computation of the suite (about 1.5 minutes); the
 cheap exact spot-check in appendix_a.py refers here for the full identity.
 
-Run:  python sec4_4_1.py
+Run:  python checks/sec4_4_1.py
 """
 from _common import *
 

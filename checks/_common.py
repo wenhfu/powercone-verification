@@ -37,7 +37,7 @@ Each ``appendix_*.py`` / ``sec*_*.py`` script starts with ``banner(<section>,
 <formulas>)`` and ends with ``report(<section>)``, so every run states which
 part of the paper and which labelled equations it checks.  A script therefore runs standalone
 
-    python sec4_4_0.py
+    python checks/sec4_4_0.py
 
 and the whole suite can be driven by ``python run_all.py``.
 """

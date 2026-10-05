@@ -16,7 +16,7 @@ Everything is computed in exact arithmetic (rational numbers and polynomials), s
 Run one part of the paper:
 
 ```sh
-python sec4_3.py
+python checks/sec4_3.py
 ```
 
 Run everything:
@@ -83,6 +83,8 @@ Run an individual script when the intermediate values of one part are needed.
 
 ## Scripts
 
+The individual checks are in the `checks/` folder.
+
 | Script | Part of the paper | Items | Result |
 |---|---|---|---|
 | `appendix_a.py` | Appendix A | 9 | ALL OK |
@@ -124,7 +126,7 @@ OVERALL [subsection 4.4.1]   (eq:discd): ALL OK   (2 items checked, 0 failed)
 
 ## Notes
 
-* `_common.py` collects the shared symbols, the barrier and the auxiliary polynomials, together with the printing, Sturm and Bernstein helpers.  It is imported by the scripts above and is not meant to be run on its own.
+* `checks/_common.py` collects the shared symbols, the barrier and the auxiliary polynomials, together with the printing, Sturm and Bernstein helpers.  It is imported by the scripts above and is not meant to be run on its own.
 
 ## License
 

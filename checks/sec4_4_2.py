@@ -65,7 +65,7 @@ this rewriting is faithful; working in (u,s,w) instead of (e,t) halves the
 degrees and keeps the expansion small.  The relation w^2 = u*s is applied by
 reduce_w().
 
-Run:  python sec4_4_2.py
+Run:  python checks/sec4_4_2.py
 """
 from _common import *
 

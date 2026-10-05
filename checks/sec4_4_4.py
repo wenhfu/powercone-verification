@@ -20,7 +20,7 @@ What is verified here
 The absence of real roots (and hence the strict positivity of d_{e,t} on the
 relevant domain) is then established in appendix_c.py from the Sturm chain.
 
-Run:  python sec4_4_4.py
+Run:  python checks/sec4_4_4.py
 """
 from _common import *
 
