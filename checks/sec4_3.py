@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.3 -- the quadratic form Q and the cubic form P.
+subsection 4.3: the quadratic form Q and the cubic form P.
 
-Paper: subsection 4.3 (eq:Q and eq:P).
+Paper: subsection 4.3, equations (4.7) and (4.9).
 
-For the power-cone barrier f_e of eq:fdef the paper derives closed forms for
+For the power-cone barrier f_e of (4.3) the paper derives closed forms for
 the quadratic and the cubic form
 
-    Q(p,r) = G[h,h]        (self-concordance form),        (eq:Q)
-    P(p,r) = T_f[h,h,h]    (third-order form),             (eq:P)
+    Q(p,r) = G[h,h]        (self-concordance form),        (4.7)
+    P(p,r) = T_f[h,h,h]    (third-order form),             (4.9)
 
 on the slice (X,Z) = (1,t), where h = p*d/dX + (c*t*p + r)*d/dZ.
 
 What is verified here
 ---------------------
 * The coefficients of Q(p,r) and P(p,r), recomputed from f_e by symbolic
-  differentiation, coincide with the closed forms of eq:Q / eq:P.
+  differentiation; they should agree with the closed forms of (4.7) and (4.9).
 
-Every coefficient is printed in factored form so that it can be compared with
+Every coefficient is printed in factored form, so that it can be compared with
 the compact factors used in the paper.
 
 Run:  python checks/sec4_3.py
@@ -25,15 +25,15 @@ Run:  python checks/sec4_3.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.3', 'eq:Q, eq:P')
+banner('subsection 4.3', '(4.7), (4.9)')
 
 
 def show_factor_coeffs(name, expr, *vars):
-    """Print the coefficients of ``expr``, one line per monomial, factored.
+    """Print the coefficients of ``expr``, one per monomial, in factored form.
 
-    Unlike ``show_coeffs`` this factors coefficients that are pure numbers as
-    well, because subsection 4.3 compares its coefficients with the product
-    form in which eq:Q / eq:P are written.
+    Unlike ``show_coeffs``, this also factors coefficients that are pure
+    numbers, because subsection 4.3 compares its coefficients with the product
+    form in which (4.7) and (4.9) are written.
     """
     P = sp.Poly(sp.expand(expr), *vars)
     print("%s   (total degree %d, coefficients factored):"
@@ -43,7 +43,7 @@ def show_factor_coeffs(name, expr, *vars):
         print("   [%s] = %s" % (tag, sp.factor(co)))
 
 
-# Closed forms of eq:Q and eq:P, transcribed as they appear in the paper.
+# Closed forms of (4.7) and (4.9), transcribed as they appear in the paper.
 Q_pap = ((1-t**2)*A*(A-4*e**2*t**2)*p**2
          + 8*e*t*A*(1-t**2)*p*r
          + 4*(4*e**2*t**2+3*e**2+9)*r**2)
@@ -58,10 +58,10 @@ P_pap = (A**3*(1-t**2)**3*p**3
 #     T_f[h,h,h] = D^3 f[h,h,h] - 6 D^2 f[h,h] <grad f,h> + 4 <grad f,h>^3,
 # evaluated on the slice (X,Z) = (1,t) and cleared of positive factors.
 show_factor_coeffs("Q(p,r) recomputed from G[h,h] of f_e", Q_der, p, r)
-check("eq:Q   Q(p,r)", is_zero(Q_der - Q_pap))
+check("(4.7)   Q(p,r)", is_zero(Q_der - Q_pap))
 print()
 show_factor_coeffs("P(p,r) recomputed from T_f[h,h,h] of f_e", P_der, p, r)
-check("eq:P   P(p,r)", is_zero(P_der - P_pap))
+check("(4.9)   P(p,r)", is_zero(P_der - P_pap))
 print()
 
 report("subsection 4.3")

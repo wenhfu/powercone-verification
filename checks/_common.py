@@ -7,46 +7,52 @@ algebra of
 
 (subsection 4.3, subsection 4.4 and Appendices A-C).
 
-What is checked here are the algebraic claims of that scope: identities,
-factorisations and sign certificates.  The steps of the proof that are not
-algebraic -- the real-root continuation of lem:root-continuation and
-lem:compactcontinuation, the Sylvester step of lem:Qpd, and the passage from
-an identity to a sign statement -- remain the paper's own arguments.
-Everything is computed in exact (rational / polynomial) arithmetic, and every
-equality verdict is decided by exact normalisation (see ``is_zero``), never
-by a heuristic simplification.
+The checks cover the algebraic claims of that scope: identities, factorisations
+and sign certificates.  The steps of the proof that are not algebraic (the
+real-root continuation of Lemmas 2.4 and 4.3, the Sylvester step of Lemma 4.1,
+and the passage from an identity to a sign statement) remain the paper's own
+arguments.  Everything is computed in exact (rational / polynomial) arithmetic,
+and every equality verdict is decided by exact normalisation (see ``is_zero``),
+never by a heuristic simplification.
 
 What this module provides
 -------------------------
 * Verdict tracking  : ``check``, ``silent``, ``banner``, ``reset_marks``,
                       ``report``.
-* Exact decisions   : ``is_zero``, the zero test behind every equality
-                      verdict, and ``clear_denominator``, an exact and
-                      remainder-checked division.
+* Exact decisions   : ``is_zero``, the zero test behind every equality verdict,
+                      and ``clear_denominator``, an exact, remainder-checked
+                      division.
 * Text output       : ``show_coeffs``, ``show_factors``, ``num_factor_str``,
                       ``pat`` (plain text; polynomials are never rendered with
                       multi-line ``pprint``).
 * Exact / interval  : ``primitive_int``, ``roots_in_unit``, ``bernstein_1d``
                       (used for the sign certificates).
-* The symbols, the barrier ``f_e`` of eq:fdef, and all quantities derived from
-  it, together with the explicit factors ``Pi_1``, ``Pi_2`` of Appendix A and
-  the auxiliary polynomials of Appendix B.
+* The symbols, the barrier ``f_e`` of (4.3) and all quantities derived from it,
+  together with the explicit factors ``Pi_1``, ``Pi_2`` of Appendix A and the
+  auxiliary polynomials of Appendix B.
 
 Output policy
 -------------
-Only values COMPUTED BY PYTHON are printed.  Paper expressions occur solely
-inside comparisons, so the output is a list of
+Only values computed by SymPy are printed.  The paper's formulas enter only
+through the verdict, which names the equation being checked and reduces the
+expression to a short handle, so the output has the form
 
     <value computed by SymPy>
-       [OK ] <paper label> ...
+       verified   <equation>   <expression>
 
-that can be compared, line by line, with the paper by hand.
+in which every computed value can be read off, line by line, against the
+corresponding displayed formula of the paper.
 
 Usage
 -----
-Each ``appendix_*.py`` / ``sec*_*.py`` script starts with ``banner(<section>,
-<formulas>)`` and ends with ``report(<section>)``, so every run states which
-part of the paper and which labelled equations it checks.  A script therefore runs standalone
+This module is imported by the checks; it is not meant to be run on its own.  It
+is where the shared symbols, the barrier, the auxiliary polynomials, and the
+printing, Sturm and Bernstein helpers live.
+
+Each ``appendix_*.py`` / ``sec*_*.py`` script opens with ``banner(<section>,
+<formulas>)`` and closes with ``report(<section>)``, so every run states which
+part of the paper and which equation numbers it covers.  A script therefore
+runs standalone
 
     python checks/sec4_4_0.py
 
@@ -68,59 +74,75 @@ except Exception:
 # ----------------------------------------------------------------------
 # Verdict bookkeeping
 # ----------------------------------------------------------------------
-ok_marks = []      # (label, passed) pairs collected by the running script
+# Field widths of the OVERALL line: the bracketed section, then the verdict.
+# They keep the parts of a run_all.py report aligned.
+SUMMARY_WIDTH = 20
+VERDICT_WIDTH = 4
+ok_marks = []      # (name, passed) pairs collected by the running script
 last_report = {}   # filled by report(); read by run_all.py
 current_section = None    # part of the paper being checked (set by banner)
-current_formulas = None   # labelled equations checked by the current script
+current_formulas = None   # equation numbers checked by the current script
 
 
 def check(name, cond):
-    """Record one verdict and print its paper label together with [OK ]/[BAD]."""
+    """Record one verdict and print "verified   <equation>   <expression>".
+
+    The line opens with the verdict, ``verified`` (or ``FAILED`` when the check
+    does not hold), and then gives the equation that was checked together with a
+    short handle for the expression.  The verdict comes first, so that the lines
+    of a script line up under one another.
+    """
     ok_marks.append((name, bool(cond)))
-    print("   [%s] %s" % ("OK " if cond else "BAD", name))
+    print("   %s   %s" % (("verified" if cond else "FAILED").ljust(8), name))
     return bool(cond)
 
 
 def silent(cond):
-    """Same as check(), but not printed: an ingredient of a compound verdict.
+    """Same as check(), but silent: an ingredient of a compound verdict.
 
-    Used when several elementary facts are combined into a single line of
-    output, so that the printed list stays readable.
+    Several elementary facts are often combined into a single printed line, so
+    that the list of verdicts stays readable.
     """
     return bool(cond)
 
 
 def banner(section, formulas=None):
-    """Announce the part of the paper checked by the current script.
+    """Announce the part of the paper covered by the current script.
 
-    Prints a header naming the section and the labelled equations, and stores
-    them so that the final summary carries the same labels.
+    Prints a header naming the section and the equation numbers, and stores both
+    so that the closing summary carries the same numbers.
     """
     global current_section, current_formulas
     current_section = section
     current_formulas = formulas
     print("=" * 72)
     print("Checking %s%s" % (section, (": " + formulas) if formulas else ""))
-    print("only python-computed values are printed; compare them with the paper")
+    print("only SymPy-computed values are printed; compare them with the paper")
     print("=" * 72)
     print()
 
 
 def reset_marks():
-    """Forget the verdicts collected so far (called at the top of each script)."""
+    """Discard the verdicts recorded so far (called at the top of each script)."""
     del ok_marks[:]
 
 
 def report(section):
-    """Print the summary of a section and clear the verdict list."""
+    """Print the summary of a section and reset the verdict list."""
     global current_section, current_formulas
     bad = [n for n, ok in ok_marks if not ok]
     last_report.update(section=section, n=len(ok_marks), bad=bad)
-    tag = ("   (%s)" % current_formulas) if current_formulas else ""
+    if current_formulas:
+        tag = current_formulas
+        if not tag.startswith("("):
+            tag = "(" + tag + ")"
+        tag = "   " + tag
+    else:
+        tag = ""
     print("=" * 72)
-    print("OVERALL [%s]%s: %s   (%d items checked, %d failed)"
-          % (section, tag, "ALL OK" if not bad else "FAILED",
-             len(ok_marks), len(bad)))
+    print("OVERALL %s%s%s"
+          % (("[%s]" % section).ljust(SUMMARY_WIDTH),
+             ("PASS" if not bad else "FAIL").ljust(VERDICT_WIDTH), tag))
     for n in bad:
         print("   FAILED: %s" % n)
     reset_marks()
@@ -130,18 +152,18 @@ def report(section):
 
 # ----------------------------------------------------------------------
 # Printing helpers
-# (everything printed here is computed by SymPy; nothing is copied from
-# the paper)
+# (everything printed here is computed by SymPy; nothing is copied from the
+# paper)
 # ----------------------------------------------------------------------
 def show_coeffs(name, expr, *vars):
-    """Print a polynomial by listing one coefficient per degree.
+    """Print a polynomial one coefficient per line.
 
-    ``expr`` is expanded and viewed as a polynomial in ``vars``.  With a single
-    variable the coefficients are listed from the highest degree down to the
-    constant term; with several variables they are listed in descending
-    monomial order.  A coefficient that still depends on another symbol is
-    printed in factored form, whereas a pure number is printed as it stands
-    (this matches the way the paper writes the two kinds of coefficients).
+    ``expr`` is expanded and read as a polynomial in ``vars``.  With a single
+    variable the coefficients run from the leading term down to the constant;
+    with several variables they are listed in descending monomial order.  A
+    coefficient that still depends on other symbols is printed in factored form,
+    while a pure number is printed as it stands, which is how the paper writes
+    the two kinds of coefficients.
     """
     P = sp.Poly(sp.expand(expr), *vars)
 
@@ -162,9 +184,9 @@ def show_coeffs(name, expr, *vars):
 
 
 def num_factor_str(n):
-    """Prime-power form of a rational number, matching the paper's style.
+    """Write a rational number as a product of prime powers, as the paper does.
 
-    For instance 134150929655722049475182592 becomes '(2)^(44)*(3)^(27)' and
+    For instance 134150929655722049475182592 becomes '(2)^(44)*(3)^(27)', and
     -4096 becomes '(-1)*(2)^(12)'.
     """
     n = sp.Rational(n)
@@ -183,9 +205,9 @@ def num_factor_str(n):
 def show_factors(name, expr):
     """Print a factorisation, one factor per line.
 
-    SymPy keeps a rational constant as an ordinary numeric factor, which is
-    expanded into prime powers here so that it can be read off against the
-    paper's forms such as 2^44 * 3^27.
+    SymPy keeps the rational constant as an ordinary numeric factor; it is
+    expanded into prime powers here, so that it can be read off against the
+    paper's forms, such as 2^44 * 3^27.
     """
     print("%s :" % name)
     for g in sp.Mul.make_args(sp.factor(expr)):
@@ -199,7 +221,7 @@ def show_factors(name, expr):
 
 
 def pat(v):
-    """Sign pattern of a list of non-zero reals, e.g. (+,-,+,+,+,-,-)."""
+    """Sign pattern of a list of nonzero reals, e.g. (+,-,+,+,+,-,-)."""
     return "(" + ",".join("+" if x > 0 else "-" for x in v) + ")"
 
 
@@ -207,13 +229,13 @@ def pat(v):
 # Exact / interval helpers
 # ----------------------------------------------------------------------
 def is_zero(expr):
-    """True iff ``expr`` is identically zero: an exact decision procedure.
+    """True if and only if ``expr`` is identically zero: an exact decision.
 
     The expression is first put over a common denominator (``sp.cancel``) and
-    its numerator is then expanded, so the verdict follows from polynomial
+    the numerator is then expanded, so the verdict follows from polynomial
     normalisation.  ``sp.simplify`` is never used as a criterion: it is a
-    heuristic that tries to produce a simpler expression and can fail to prove
-    an identity that actually holds.
+    heuristic that looks for a simpler expression and may fail to prove an
+    identity that does hold.
     """
     num, den = sp.fraction(sp.cancel(expr))
     if sp.expand(den) == 0:
@@ -224,12 +246,12 @@ def is_zero(expr):
 def clear_denominator(expr, *vars):
     """Exact quotient of a rational expression by its own denominator.
 
-    ``expr`` is combined over one denominator and the numerator is divided by
-    it in the polynomial ring ``Q[vars]``.  The remainder is checked to vanish,
-    so the division is a proof that the denominator divides the numerator and
-    the result is a genuine polynomial -- this is how the positive normalising
-    factors of eq:GQ and eq:CP are cleared, with exact arithmetic instead of a
-    heuristic simplification.
+    ``expr`` is combined over a single denominator, and the numerator is then
+    divided by that denominator in the polynomial ring ``Q[vars]``.  The
+    remainder is checked to vanish, so the division proves that the denominator
+    divides the numerator and that the result is a genuine polynomial.  This is
+    how the positive normalising factors of (4.6) and (4.8) are cleared, in
+    exact arithmetic rather than by a heuristic simplification.
     """
     num, den = sp.fraction(sp.together(expr))
     q, rem = sp.div(sp.Poly(sp.expand(num), *vars),
@@ -253,9 +275,9 @@ def primitive_int(g, var):
     """Rescale ``g`` by a *positive* rational so that its coefficients become
     coprime integers.
 
-    Multiplying a Sturm chain by a positive constant changes no sign and hence
-    no Sturm count; this is precisely the normalisation used in Appendix C to
-    make the chain readable.
+    Multiplying a Sturm chain by a positive constant changes no sign, and hence
+    no Sturm count; this is the normalisation used in Appendix C to make the
+    chain readable.
     """
     Pg = sp.Poly(sp.expand(g), var)
     nums, dens = [], []
@@ -269,9 +291,9 @@ def primitive_int(g, var):
 def roots_in_unit(p_expr, u_val):
     """Exact number of roots of ``p_expr(u_val, s)`` on the interval [0,1].
 
-    ``sp.Poly.count_roots(0, 1)`` counts the endpoints as well, so a count of 0
-    certifies that the polynomial has no root anywhere in [0,1] -- stronger
-    than the count on (0,1) that subsection 4.4.3 quotes.
+    ``sp.Poly.count_roots(0, 1)`` takes the endpoints into account as well, so a
+    count of 0 certifies that the polynomial has no root anywhere in [0,1], a
+    stronger statement than the count on (0,1) that subsection 4.4.3 quotes.
     """
     return sp.Poly(sp.expand(p_expr.subs(u, u_val)), s).count_roots(0, 1)
 
@@ -279,9 +301,9 @@ def roots_in_unit(p_expr, u_val):
 def bernstein_1d(p_expr, var, lo, hi, m):
     """Bernstein coefficients of degree ``m`` of ``p_expr`` on ``[lo,hi]``.
 
-    The polynomial is first pulled back to the unit interval via
-    ``var = lo + (hi-lo)*v``.  If all returned coefficients are > 0 then the
-    polynomial is > 0 on the whole interval.
+    The polynomial is first pulled back to the unit interval by
+    ``var = lo + (hi-lo)*v``.  If every returned coefficient is positive, then
+    the polynomial is positive on the whole interval.
     """
     v = sp.Symbol("v")
     Qv = sp.Poly(sp.expand(p_expr.subs(var, lo + (hi - lo)*v)), v)
@@ -308,8 +330,8 @@ c = (1 - e)/2     # offset of the affine slice Z = c*t*p + r
 
 
 # ----------------------------------------------------------------------
-# The barrier f_e of eq:fdef and every quantity derived from it.
-# These are inputs to the checks; they are never printed.
+# The barrier f_e of (4.3) and every quantity derived from it.
+# They are inputs to the checks and are never printed.
 # ----------------------------------------------------------------------
 f = -(3-e)/6*sp.log(X) - (9-e**2)/(6*A)*sp.log(1 - Z**2/X**(1-e))
 
@@ -328,10 +350,10 @@ D3f = fxxx*hX**3 + 3*fxxz*hX**2*hZ + 3*fxzz*hX*hZ**2 + fzzz*hZ**3
 Ghh = (fxx - fx**2)*hX**2 + 2*(fxz - fx*fz)*hX*hZ + (fzz - fz**2)*hZ**2
 Tfff = D3f - 6*D2f*Df + 4*Df**3
 
-# Closed forms of eq:Q and eq:P, obtained from G[h,h] and T_f[h,h,h] on the
+# Closed forms of (4.7) and (4.9), obtained from G[h,h] and T_f[h,h,h] on the
 # slice (X,Z) = (1,t) after clearing the positive normalising factors.  The
 # clearing is an exact, remainder-checked polynomial division (never
-# sp.simplify), so Q_der and P_der are the genuine polynomials of eq:Q / eq:P.
+# sp.simplify), so Q_der and P_der are the genuine polynomials of (4.7) / (4.9).
 Q_der = clear_denominator(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2),
                           e, t, p, r)
 P_der = clear_denominator(Tfff.subs({X: 1, Z: t})
@@ -344,7 +366,7 @@ P1 = sp.expand(P_der.subs({p: 1, r: xi}))
 d = sp.expand(Q1**3 - P1**2)
 leading = sp.expand(d.coeff(xi, 6))                   # [xi^6] d_{e,t} = 576 L(u,s)
 
-# Base-point polynomial d_0 of eq:basepoly, cleared of denominators.
+# Base-point polynomial d_0 of (4.39), cleared of denominators.
 d0 = sp.expand(sp.Rational(729, 2)*d.subs({e: sp.Rational(1, 3), t: sp.Rational(1, 2)}))
 
 
@@ -352,8 +374,8 @@ d0 = sp.expand(sp.Rational(729, 2)*d.subs({e: sp.Rational(1, 3), t: sp.Rational(
 # Appendix A
 #   Pi_1(u,s) = sum_{j=0..6} a_j(u) s^j
 #   Pi_2(u,s) = sum_{j=0..9} b_j(u) s^j
-# The factors a_j, b_j are the compact forms printed in Appendix A;
-# their product is matched against Disc_xi d_{e,t} in sec4_4_1.py.
+# The factors a_j, b_j are the compact forms printed in Appendix A, and their
+# product is matched against Disc_xi d_{e,t} under subsection 4.4.1.
 # ----------------------------------------------------------------------
 a = [-4*(u+3)**6,
      12*(u+3)**6,
@@ -379,7 +401,7 @@ Pi2 = sp.expand(sum(b[j]*s**j for j in range(10)))
 
 # ----------------------------------------------------------------------
 # Auxiliary factors of Appendix B
-# (used by appendix_b1.py, appendix_b2.py and sec4_4_3.py)
+# (used by the Appendix B checks and by subsection 4.4.3)
 # ----------------------------------------------------------------------
 A6 = 1612*u**6 - 7822*u**5 + 35755*u**4 - 62928*u**3 + 62694*u**2 - 18954*u + 2187
 A7 = (46301*u**7 - 430305*u**6 + 715218*u**5 + 2010910*u**4

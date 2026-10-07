@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-Appendix C -- the exact Sturm chain of the base-point polynomial d_0.
+Appendix C: the exact Sturm chain of the base-point polynomial d_0.
 
-Paper: Appendix C, together with eq:basepoly of
+Paper: Appendix C, together with (4.39) of
 subsection 4.4.4.
 
-Starting from S_0 = d_0 and S_1 = d_0', the Sturm chain is built by repeatedly
-taking the negative Euclidean remainder.  The paper lists a rescaled version
-of the chain in which every member is multiplied by a positive constant; such
-a rescaling changes no sign and therefore no Sturm count.
+Starting from S_0 = d_0 and S_1 = d_0', the Sturm chain is built by taking
+negative Euclidean remainders repeatedly.  The paper prints a rescaled version
+of the chain, in which every member is multiplied by a positive constant; such a
+rescaling changes no sign and therefore no Sturm count.
 
 What is verified here
 ---------------------
-* All seven members S_0..S_6, rescaled to primitive integer polynomials,
-  against the chain printed in Appendix C.
-* The signs of the chain at -oo and +oo, and hence
-  V(-oo) = V(+oo) = 3, which by Sturm's theorem means that d_0 has no real
-  root -- so d_0 is strictly positive (d_0(0) = 66199 > 0).
+* The seven members S_0..S_6, rescaled to primitive integer polynomials, against
+  the chain printed in Appendix C.
+* The signs of the chain at -oo and +oo, hence V(-oo) = V(+oo) = 3, which by
+  Sturm's theorem means that d_0 has no real root, so that d_0 is strictly
+  positive (d_0(0) = 66199 > 0).
 * The same conclusion, independently, from an exact root count.
 
 Run:  python checks/appendix_c.py
@@ -24,7 +24,7 @@ Run:  python checks/appendix_c.py
 from _common import *
 
 reset_marks()
-banner('Appendix C', 'Sturm chain of d_0 (Appendix C)')
+banner('Appendix C', 'Sturm chain of d_0 of (4.39), Appendix C')
 
 # SymPy returns the chain; primitive_int() rescales each member by a positive
 # rational so that its coefficients are coprime integers, exactly as the paper

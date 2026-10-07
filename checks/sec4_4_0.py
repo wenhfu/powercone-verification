@@ -1,44 +1,40 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.0 -- nonnegativity of the binary sextic L(u,s).
+subsection 4.4.0: nonnegativity of the binary sextic L(u,s).
 
-Paper: subsection 4.4.0
-(eq:t0factor, eq:leading-before-L, eq:leading, eq:Lpower, eq:Lmatrix,
-eq:Lpositive).
+Paper: subsection 4.4.0, equations (4.13), (4.15), (4.17), (4.18), (4.20), (4.21).
 
-Writing d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 as a polynomial in xi, its leading
-coefficient factors as
+Written as a polynomial in xi, d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 has leading
+coefficient
 
     [xi^6] d_{e,t} = 576 L(u,s),       u = e^2,  s = t^2,
 
-with L the binary sextic of eq:leading.  The proof of positivity of d_{e,t}
-uses the Bernstein representation of L on [0,1]^2.  The degenerate case t = 0
-is treated separately by the paper (Lemma lem:t0, eq:t0factor) and is checked
-here first.
+with L the binary sextic of (4.17).  The proof that d_{e,t} is positive uses the
+Bernstein representation of L on [0,1]^2.  The degenerate case t = 0 is treated
+separately by the paper (Lemma 4.2, (4.13)) and is checked here first.
 
 What is verified here
 ---------------------
-* The two coefficients of eq:Q / eq:P that are displayed again in this
+* The two coefficients of (4.7) / (4.9) that are displayed again in this
   subsection, [xi^2] Q(1,xi) and [xi^3] P(1,xi).
-* eq:t0factor        : for t = 0 the identity
-                       Delta(p,r) = 108 r^2 A^3 (A p^2 - 4 r^2)^2, which is
-                       >= 0 because A = e^2 + 3 > 0 (Lemma lem:t0).
-* eq:leading-before-L : the closed form of the leading coefficient.
-* eq:leading         : [xi^6] d_{e,t} = 576 L(u,s) with u = e^2, s = t^2.
-* eq:Lpower          : the power-basis expansion of L(u,s).
-* eq:Lmatrix         : the 4 x 4 matrix of Bernstein coefficients of L for
-                       degree 3 in each variable.
-* eq:Lpositive       : L(u,s) > 0 on (0,1)^2.  Subtracting 81(1-u)^3 (the
-                       first row of the Bernstein matrix, via the partition
-                       of unity) leaves a polynomial whose Bernstein
-                       coefficients are the remaining rows, all >= 0.
+* (4.13) : for t = 0 the identity
+               Delta(p,r) = 108 r^2 A^3 (A p^2 - 4 r^2)^2,
+           which is >= 0 because A = e^2 + 3 > 0 (Lemma 4.2).
+* (4.15) : the closed form of the leading coefficient.
+* (4.17) : [xi^6] d_{e,t} = 576 L(u,s) with u = e^2, s = t^2.
+* (4.18) : the power-basis expansion of L(u,s).
+* (4.20) : the 4 x 4 matrix of Bernstein coefficients of L, of degree 3 in each
+           variable.
+* (4.21) : L(u,s) > 0 on (0,1)^2.  Subtracting 81(1-u)^3 (the first row of the
+           Bernstein matrix, by the partition of unity) leaves a polynomial
+           whose Bernstein coefficients are the remaining rows, all >= 0.
 
 Run:  python checks/sec4_4_0.py
 """
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.0', 'eq:t0factor, eq:Q, eq:P, eq:leading-before-L, eq:leading, eq:Lpower, eq:Lmatrix, eq:Lpositive')
+banner('subsection 4.4.0', '(4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21)')
 
 
 def bern_coeffs(expr, du, ds):
@@ -74,40 +70,40 @@ L_pap = (81 + 81*u + 27*u**2 + 3*u**3
 # The two coefficients of Q and P that the paper quotes again in this
 # subsection; the printed value is what SymPy computes from f_e.
 print("[xi^2] Q(1,xi) =", sp.factor(Q1.coeff(xi, 2)))
-check("eq:Q   [xi^2] Q(1,xi)",
+check("(4.7)   [xi^2] Q(1,xi)",
       is_zero(sp.expand(Q1.coeff(xi, 2) - 4*(4*e**2*t**2+3*e**2+9))))
 print("[xi^3] P(1,xi) =", sp.factor(P1.coeff(xi, 3)))
-check("eq:P   [xi^3] P(1,xi)",
+check("(4.9)   [xi^3] P(1,xi)",
       is_zero(sp.expand(P1.coeff(xi, 3) + 16*e*t*(9*A+t**2*(5*e**2-9)))))
 print()
 
-# Lemma lem:t0 / eq:t0factor: the paper treats t = 0 separately.  There
-# Delta(p,r) = Q(p,r)^3 - P(p,r)^2 factors, with a squared cofactor, so it is
+# Lemma 4.2 / (4.13): the paper treats t = 0 separately.  For t = 0,
+# Delta(p,r) = Q(p,r)^3 - P(p,r)^2 factors with a squared cofactor, hence is
 # nonnegative as soon as A = e^2 + 3 > 0.
 Delta0 = sp.expand(sp.expand(Q_der**3 - P_der**2).subs(t, 0))
 print("Delta(p,r) at t = 0 =", sp.factor(Delta0))
-check("eq:t0factor   Delta(p,r) for t = 0",
+check("(4.13)   Delta(p,r) for t = 0",
       is_zero(Delta0 - 108*r**2*A**3*(A*p**2 - 4*r**2)**2))
-check("eq:t0factor   Delta(p,r) >= 0 for t = 0   (Delta = 108 r^2 A^3 (square))",
+check("(4.13)   Delta(p,r) >= 0 for t = 0   (Delta = 108 r^2 A^3 (square))",
       is_zero(sp.cancel(Delta0/(108*r**2*A**3)) - (A*p**2 - 4*r**2)**2))
 print()
 
-# eq:leading-before-L: the leading coefficient of d_{e,t} in the form of the
-# paper, i.e. before the substitution u = e^2, s = t^2 is made.
-check("eq:leading-before-L   [xi^6] d_{e,t}",
+# (4.15): the leading coefficient of d_{e,t} in the paper's form, that is,
+# before the substitution u = e^2, s = t^2 is made.
+check("(4.15)   [xi^6] d_{e,t}",
       is_zero(sp.expand(leading - lead_pap)))
 
-# eq:leading: L is *defined* as [xi^6] d_{e,t} / 576.  Recompute it from the
-# monomials of the leading coefficient (only even powers occur) and compare
+# (4.17): L is *defined* as [xi^6] d_{e,t} / 576.  Recompute it from the
+# monomials of the leading coefficient (only even powers occur), and compare it
 # both with the compact closed form and with the power-basis expansion.
 L_rec = sp.expand(sum(co*u**(i//2)*s**(j//2)
                       for (i, j), co in sp.Poly(leading, e, t).terms())/576)
-check("eq:leading   [xi^6] d_{e,t} = 576 L(u,s)   with u=e^2, s=t^2",
+check("(4.17)   [xi^6] d_{e,t} = 576 L(u,s)   with u=e^2, s=t^2",
       is_zero(sp.expand(leading - 576*L_expl.subs({u: e**2, s: t**2}))))
-check("eq:Lpower   L(u,s) power-basis expansion", sp.expand(L_rec - L_pap) == 0)
+check("(4.18)   L(u,s) power-basis expansion", sp.expand(L_rec - L_pap) == 0)
 print()
 
-# eq:Lmatrix: Bernstein coefficients of L of bidegree (3,3).
+# (4.20): Bernstein coefficients of L of bidegree (3,3).
 ell = bern_coeffs(L_rec, 3, 3)
 ell_pap = sp.Matrix([[81, 81, 81, 81],
                      [108, 84, 84, 96],
@@ -115,8 +111,8 @@ ell_pap = sp.Matrix([[81, 81, 81, 81],
                      [192, 64, 0, 0]])
 print("Bernstein coefficients of L(u,s), m=3 in u and in s:")
 sp.pprint(ell)
-check("eq:Lmatrix   Bernstein coefficient matrix (l_ij)", (ell - ell_pap).is_zero_matrix)
-# eq:Lpositive: L(u,s) > 0 for 0<u,s<1.  The paper's argument uses only the
+check("(4.20)   Bernstein coefficient matrix (l_ij)", (ell - ell_pap).is_zero_matrix)
+# (4.21): L(u,s) > 0 for 0<u,s<1.  The paper's argument uses only the
 # first row of the matrix and the partition of unity,
 #     81 B_0^(3)(u) sum_j B_j^(3)(s) = 81(1-u)^3,
 # so it is enough to look at the Bernstein coefficients of L - 81(1-u)^3,
@@ -124,10 +120,10 @@ check("eq:Lmatrix   Bernstein coefficient matrix (l_ij)", (ell - ell_pap).is_zer
 ell_rest = bern_coeffs(sp.expand(L_rec - 81*(1-u)**3), 3, 3)
 print("Bernstein coefficients of L(u,s) - 81(1-u)^3:")
 sp.pprint(ell_rest)
-check("eq:Lpositive   L - 81(1-u)^3 is the sum of the Bernstein terms with i >= 1",
+check("(4.21)   L - 81(1-u)^3 is the sum of the Bernstein terms with i >= 1",
       ell_rest == sp.Matrix([[0 if i == 0 else ell[i, j] for j in range(4)]
                              for i in range(4)]))
-check("eq:Lpositive   L(u,s) > 0 for 0<u,s<1   (all those coefficients >= 0)",
+check("(4.21)   L(u,s) > 0 for 0<u,s<1   (all those coefficients >= 0)",
       all(v >= 0 for v in ell_rest))
 print()
 

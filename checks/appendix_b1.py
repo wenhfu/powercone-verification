@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-Appendix B.1 -- positivity of the auxiliary factors A_6 and A_7.
+Appendix B.1: positivity of the auxiliary factors A_6 and A_7.
 
-Paper: Appendix B.1 (eq:A6, eq:A7 and the Bernstein coefficient lists below
-them).
+Paper: Appendix B.1 (the definitions of A_6 and A_7, and the Bernstein
+coefficient lists that follow them).
 
-A_6 and A_7 are the two nontrivial factors of Disc_s Pi_2 (see sec4_4_3.py).
-Both are shown to be positive on [0,1] by exhibiting their Bernstein
-coefficients, which are all positive.
+A_6 and A_7 are the two nontrivial factors of Disc_s Pi_2 (see
+subsection 4.4.3).  Both are shown to be positive on [0,1] by exhibiting their
+Bernstein coefficients: all of them are positive.
 
 What is verified here
 ---------------------
-* The coefficient lists of A_6(u) and A_7(u) against eq:A6 / eq:A7.
+* The coefficient lists of A_6(u) and A_7(u), against the definitions in
+  Appendix B.1.
 * The Bernstein coefficients of A_6(v/2), A_6((1+v)/2), A_7(v/2) and
-  A_7((1+v)/2) against the four lists printed in Appendix B.1.
-* Positivity of A_6 and A_7 on [0,1] from the positivity of all Bernstein
-  coefficients on each half-interval.
+  A_7((1+v)/2), against the four lists printed in Appendix B.1.
+* The positivity of A_6 and A_7 on [0,1], which follows from the positivity of
+  every Bernstein coefficient on each half-interval.
 
-The half-interval split at 1/2 is used because 2u-1 enters the discriminant of
-Pi_2 as a factor; the two halves are handled separately.
+The interval is split at 1/2 because 2u-1 appears as a factor of Disc_s Pi_2;
+each half is then treated separately.
 
 Run:  python checks/appendix_b1.py
 """
 from _common import *
 
 reset_marks()
-banner('Appendix B.1', 'A_6, A_7 positivity (Appendix B.1)')
+banner('Appendix B.1', 'A_6, A_7 of (4.33), Appendix B.1')
 
 # The two auxiliary polynomials themselves, coefficient by coefficient.
 show_coeffs("A_6(u)", A6, u)
@@ -33,8 +34,8 @@ show_coeffs("A_7(u)", A7, u)
 print()
 
 # Bernstein coefficients of A_6 and A_7 of the proper degree on each half of
-# [0,1]; the change of variable u = v/2 (resp. u = (1+v)/2) maps [0,1] onto
-# the half-interval.
+# [0,1]; the change of variable u = v/2 (respectively u = (1+v)/2) maps [0,1]
+# onto that half-interval.
 cA6a = bernstein_1d(A6, u, 0, sp.Rational(1, 2), 6)
 cA6b = bernstein_1d(A6, u, sp.Rational(1, 2), 1, 6)
 cA7a = bernstein_1d(A7, u, 0, sp.Rational(1, 2), 7)
@@ -65,7 +66,7 @@ check("Appendix B.1   A_6(v/2) Bernstein coefficients", list(cA6a) == A6a_pap)
 check("Appendix B.1   A_6((1+v)/2) Bernstein coefficients", list(cA6b) == A6b_pap)
 check("Appendix B.1   A_7(v/2) Bernstein coefficients", list(cA7a) == A7a_pap)
 check("Appendix B.1   A_7((1+v)/2) Bernstein coefficients", list(cA7b) == A7b_pap)
-# A polynomial all of whose Bernstein coefficients are > 0 is > 0 on the
+# A polynomial whose Bernstein coefficients are all positive is positive on the
 # interval; hence A_6 > 0 and A_7 > 0 on [0,1].
 check("Appendix B.1   A_6(u) > 0 on [0,1]  (all Bernstein coefficients > 0)",
       all(x > 0 for x in cA6a + cA6b))
