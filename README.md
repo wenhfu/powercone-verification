@@ -1,6 +1,6 @@
 # Symbolic verification of the upper-bound argument
 
-The Python code verifies the algebraic identities and symbolic computations appearing in *The optimal barrier parameter of the three-dimensional power cone*.
+The Python code verifies the algebraic identities and symbolic computations appearing in ***The optimal barrier parameter of the three-dimensional power cone***.
 
 It covers subsections 4.3 and 4.4 and Appendices A-C of the upper-bound proof; the non-algebraic
 steps and the lower-bound argument are proved by hand in the paper and are out of scope here.
