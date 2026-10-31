@@ -70,7 +70,6 @@ for name in FILES:
               file=sys.stderr, flush=True)
         print(buf.getvalue(), end="", file=sys.stderr, flush=True)
         raise
-    # Accumulate the failures recorded by _common.report().
     failed += len(_common.last_report.get("bad", []))
     for line in buf.getvalue().splitlines():
         if line.startswith("OVERALL ") or line.startswith("   FAILED:"):

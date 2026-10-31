@@ -10,8 +10,6 @@ steps and the lower-bound argument are proved by hand in the paper and are out o
 * Python 3; tested with Python **3.12.14**.
 * SymPy; tested with SymPy **1.14.0**.
 
-These are the tested versions, not a claim that every Python 3 or SymPy version has been tested.
-
 ## How to run
 
 From the repository root (the directory containing this README and `run_all.py`), install the
@@ -41,8 +39,7 @@ polynomial normalisation, exact root counting, Bernstein coefficient signs, or r
 division, without floating-point sampling.
 
 The examples and PASS table below show **expected results for the accompanying manuscript snapshot
-dated 2026-10-31**.  Equation numbers refer to that snapshot.  For a published release, identify the
-manuscript version together with the code release/tag or commit containing the tested files.
+dated 2026-10-31**.  Equation numbers refer to that snapshot.
 
 ### Detailed output: a single script
 
@@ -52,7 +49,6 @@ then the value SymPy computes for each ingredient, and one verdict per statement
 ```
 ========================================================================
 Checking subsection 4.4.4: (4.39)
-symbolic values and encoded coefficients; compare them with the paper
 ========================================================================
 
 d_0(xi) = (729/2)*d_{1/3,1/2}(xi)   (degree 6 in xi):

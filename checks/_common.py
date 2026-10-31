@@ -28,11 +28,6 @@ with the paper.  Printing an encoded list does not independently verify its
 entries.  Each group has a verdict identifying the equation or appendix; each
 script's documentation distinguishes checked claims from displayed data.
 
-Usage
------
-Import this module from the checks.  Each script uses ``banner`` and ``report``
-to identify its scope and verdicts.  Run one with ``python checks/sec4_4_0.py``
-or the whole suite with ``python run_all.py``.
 """
 import sys
 from math import comb
@@ -83,7 +78,6 @@ def banner(section, formulas=None):
     current_formulas = formulas
     print("=" * 72)
     print("Checking %s%s" % (section, (": " + formulas) if formulas else ""))
-    print("symbolic values and encoded coefficients; compare them with the paper")
     print("=" * 72)
     print()
 
@@ -175,7 +169,7 @@ def show_factors(name, expr):
     for g in sp.Mul.make_args(sp.factor(expr)):
         if g.is_number:
             if g == 1:
-                continue                # a unit factor carries no information
+                continue
             print("   %s" % num_factor_str(g))
             continue
         bs, ex = g.as_base_exp()
@@ -284,7 +278,7 @@ u, s = sp.symbols("u s", positive=True)
 # q = 1 - s is the variable of the base-point certificates in Appendix B.2.
 q = sp.Symbol("q")
 
-A = e**2 + 3      # shorthand for e^2 + 3, used throughout the paper
+A = e**2 + 3
 c = (1 - e)/2     # offset of the affine slice Z = c*t*p + r
 
 
@@ -293,7 +287,7 @@ c = (1 - e)/2     # offset of the affine slice Z = c*t*p + r
 # ----------------------------------------------------------------------
 f = -(3-e)/6*sp.log(X) - (9-e**2)/(6*A)*sp.log(1 - Z**2/X**(1-e))
 
-D = lambda g, v: sp.diff(g, v)        # compact partial-derivative helper
+D = lambda g, v: sp.diff(g, v)
 fx, fz = D(f, X), D(f, Z)
 fxx, fxz, fzz = D(fx, X), D(fx, Z), D(fz, Z)
 fxxx, fxxz, fxzz, fzzz = D(fxx, X), D(fxx, Z), D(fxz, Z), D(fzz, Z)

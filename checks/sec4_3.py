@@ -16,8 +16,8 @@ are given in (4.7) and (4.9), respectively.
 
 What is verified here
 ---------------------
-* The coefficients of Q(p,r) and P(p,r), recomputed from f_e by symbolic
-  differentiation; they should agree with the closed forms of (4.7) and (4.9).
+* The coefficients of Q(p,r) and P(p,r), derived from f_e by symbolic
+  differentiation and checked against the closed forms of (4.7) and (4.9).
 
 Every coefficient is printed in factored form, so that it can be compared with
 the compact factors used in the paper.

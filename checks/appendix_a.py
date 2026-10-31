@@ -71,11 +71,7 @@ check("Appendix A   Pi_2(u,1) = u(1-u)^6(7u+9)^2",
       is_zero(Pi2.subs(s, 1) - u*(1-u)**6*(7*u+9)**2))
 print()
 
-# Point readers to the full factorisation check in sec4_4_1.py.
-print("note: the identity  Disc_xi d_{e,t} = 2^44 3^27 s^3 (u-1)^3 (u+3)^15")
-print("      (s-1)^15 Pi_1^3 Pi_2  is verified symbolically in sec4_4_1.py;")
-print("      this script prints coefficient lists and checks degrees,")
-print("      extremal coefficients and boundary values.")
+print("Full discriminant factorisation is verified in sec4_4_1.py.")
 print()
 
 report("Appendix A")
