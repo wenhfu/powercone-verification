@@ -7,10 +7,12 @@ Paper: subsection 4.3, equations (4.7) and (4.9).
 For the power-cone barrier f_e of (4.3) the paper derives closed forms for
 the quadratic and the cubic form
 
-    Q(p,r) = G[h,h]        (self-concordance form),        (4.7)
-    P(p,r) = T_f[h,h,h]    (third-order form),             (4.9)
+    G[h,h] = (9-e^2)/(36 A^2 (1-t^2)^2) * Q(p,r),         (4.6)
+    T_f[h,h,h] = -e(9-e^2)/(54 A^3 (1-t^2)^3) * P(p,r),   (4.8)
 
-on the slice (X,Z) = (1,t), where h = p*d/dX + (c*t*p + r)*d/dZ.
+on the slice (X,Z) = (1,t), where A = e^2 + 3 and
+h = p*d/dX + (c*t*p + r)*d/dZ.  The normalized polynomials Q and P
+are given in (4.7) and (4.9), respectively.
 
 What is verified here
 ---------------------
@@ -56,7 +58,8 @@ P_pap = (A**3*(1-t**2)**3*p**3
 #     G[h,h]    = (f_xx - f_x^2) h_X^2 + 2 (f_xz - f_x f_z) h_X h_Z
 #                 + (f_zz - f_z^2) h_Z^2,
 #     T_f[h,h,h] = D^3 f[h,h,h] - 6 D^2 f[h,h] <grad f,h> + 4 <grad f,h>^3,
-# evaluated on the slice (X,Z) = (1,t) and cleared of positive factors.
+# evaluated on the slice (X,Z) = (1,t), then normalized using (4.6) and (4.8),
+# including the minus sign for P.
 show_factor_coeffs("Q(p,r) recomputed from G[h,h] of f_e", Q_der, p, r)
 check("(4.7)   Q(p,r)", is_zero(Q_der - Q_pap))
 print()

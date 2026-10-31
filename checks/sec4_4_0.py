@@ -96,8 +96,13 @@ check("(4.15)   [xi^6] d_{e,t}",
 # (4.17): L is *defined* as [xi^6] d_{e,t} / 576.  Recompute it from the
 # monomials of the leading coefficient (only even powers occur), and compare it
 # both with the compact closed form and with the power-basis expansion.
+leading_terms = sp.Poly(leading, e, t).terms()
+if any(i % 2 or j % 2 for (i, j), co in leading_terms):
+    raise ValueError("The leading coefficient must be even in both e and t")
 L_rec = sp.expand(sum(co*u**(i//2)*s**(j//2)
-                      for (i, j), co in sp.Poly(leading, e, t).terms())/576)
+                      for (i, j), co in leading_terms)/576)
+check("(4.17)   substitution u=e^2, s=t^2 in the leading coefficient",
+      sp.expand(576*L_rec.subs({u: e**2, s: t**2}) - leading) == 0)
 check("(4.17)   [xi^6] d_{e,t} = 576 L(u,s)   with u=e^2, s=t^2",
       is_zero(sp.expand(leading - 576*L_expl.subs({u: e**2, s: t**2}))))
 check("(4.18)   L(u,s) power-basis expansion", sp.expand(L_rec - L_pap) == 0)

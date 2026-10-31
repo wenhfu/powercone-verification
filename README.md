@@ -92,6 +92,14 @@ Only the detailed lines are discarded; the `OVERALL` lines, the `FAIL` lines and
 always printed, so no failure can be hidden.  Run a single script for the intermediate values of one
 part.
 
+Both entry points exit with status `0` when all their checks pass and status `1` when a recorded
+check fails.  The full runner continues after recorded check failures so that its final summary
+includes every part.  Unexpected errors also terminate with a nonzero exit status.
+
+Before replacing powers of `e` and `t` by powers of `u = e^2` and `s = t^2`, the leading-coefficient
+and discriminant checks explicitly verify that all exponents are even.  Both substitutions are also
+checked by exact reverse substitution.
+
 ## Scripts
 
 | Script             | Part of the paper | Equations                                                    | Result |

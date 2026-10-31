@@ -128,7 +128,7 @@ def reset_marks():
 
 
 def report(section):
-    """Print the summary of a section and reset the verdict list."""
+    """Print the summary, reset the verdicts, and exit with status 1 on failure."""
     global current_section, current_formulas
     bad = [n for n, ok in ok_marks if not ok]
     last_report.update(section=section, n=len(ok_marks), bad=bad)
@@ -148,6 +148,8 @@ def report(section):
     reset_marks()
     current_section = None
     current_formulas = None
+    if bad:
+        raise SystemExit(1)
 
 
 # ----------------------------------------------------------------------
@@ -250,8 +252,9 @@ def clear_denominator(expr, *vars):
     divided by that denominator in the polynomial ring ``Q[vars]``.  The
     remainder is checked to vanish, so the division proves that the denominator
     divides the numerator and that the result is a genuine polynomial.  This is
-    how the positive normalising factors of (4.6) and (4.8) are cleared, in
-    exact arithmetic rather than by a heuristic simplification.
+    how the normalising factors of (4.6) and (4.8), including the minus sign
+    in the cubic relation, are cleared in exact arithmetic rather than by a
+    heuristic simplification.
     """
     num, den = sp.fraction(sp.together(expr))
     q, rem = sp.div(sp.Poly(sp.expand(num), *vars),
@@ -351,8 +354,9 @@ Ghh = (fxx - fx**2)*hX**2 + 2*(fxz - fx*fz)*hX*hZ + (fzz - fz**2)*hZ**2
 Tfff = D3f - 6*D2f*Df + 4*Df**3
 
 # Closed forms of (4.7) and (4.9), obtained from G[h,h] and T_f[h,h,h] on the
-# slice (X,Z) = (1,t) after clearing the positive normalising factors.  The
-# clearing is an exact, remainder-checked polynomial division (never
+# slice (X,Z) = (1,t) after clearing the normalising factors, including the
+# minus sign in the cubic relation.  The clearing is an exact,
+# remainder-checked polynomial division (never
 # sp.simplify), so Q_der and P_der are the genuine polynomials of (4.7) / (4.9).
 Q_der = clear_denominator(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2),
                           e, t, p, r)

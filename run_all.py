@@ -10,6 +10,9 @@ captured and prints only the per-part summary, so that the whole suite can be
 reviewed at a glance.  Nothing is hidden, because only the detailed lines are
 discarded; the verdicts are always reported.
 
+Recorded check failures do not stop the remaining scripts.  The process exits
+with status 0 if every check passes and status 1 if any check fails.
+
 For the detailed report of a single part, run that check directly, e.g.
 
     python checks/sec4_4_4.py
@@ -44,10 +47,20 @@ print("#" * 72)
 failed = 0
 _common = None
 for name in FILES:
+    if _common is not None:
+        _common.last_report.clear()
     # Capture the detailed report and keep only the summary lines.
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        runpy.run_path(os.path.join(checks_dir, name), run_name="__main__")
+        try:
+            runpy.run_path(os.path.join(checks_dir, name), run_name="__main__")
+        except SystemExit as exc:
+            # report() exits with status 1 after recording a failed check.
+            # Continue to collect those failures; propagate unexpected exits.
+            common = sys.modules.get("_common")
+            if (exc.code != 1 or common is None
+                    or not common.last_report.get("bad")):
+                raise
     if _common is None:
         _common = sys.modules["_common"]
     # Accumulate the failures recorded by _common.report().
@@ -60,3 +73,4 @@ print()
 print("#" * 72)
 print("# GRAND TOTAL: %s" % ("PASS" if failed == 0 else "FAIL"))
 print("#" * 72)
+sys.exit(1 if failed else 0)
