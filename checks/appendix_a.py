@@ -15,17 +15,15 @@ where
 
 and the a_j, b_j are the compact factors displayed in Appendix A.
 
-What is verified here
----------------------
-* The coefficient lists a_0..a_6 and b_0..b_9, factored, against the compact
-  forms of Appendix A (ascending order, a_0 first).
-* The two boundary values Pi_1(u,1) and Pi_2(u,1), together with the extremal
-  coefficients a_0, a_6, b_0, b_9.
+What is displayed and checked here
+----------------------------------
+* Print the encoded coefficients a_0..a_6 and b_0..b_9 in ascending order,
+  factored as in Appendix A.
+* Eight checks cover degrees, extremal coefficients and values at s = 1.
 
-The identity  Disc_xi d_{e,t} = 2^44 3^27 s^3 (u-1)^3 (u+3)^15 (s-1)^15
-Pi_1^3 Pi_2, to which these coefficients belong, is not checked here at all:
-agreement at finitely many points would not prove it.  It is proved
-symbolically, in (u,s), under subsection 4.4.1.
+This script does not compare all 17 coefficients with independently encoded
+targets.  The full discriminant factorisation above is verified symbolically
+in (u,s) by sec4_4_1.py.
 
 Run:  python checks/appendix_a.py
 """
@@ -73,15 +71,11 @@ check("Appendix A   Pi_2(u,1) = u(1-u)^6(7u+9)^2",
       is_zero(Pi2.subs(s, 1) - u*(1-u)**6*(7*u+9)**2))
 print()
 
-# The identity that these coefficients come from,
-#
-#   Disc_xi d_{e,t} = 2^44 3^27 s^3 (u-1)^3 (u+3)^15 (s-1)^15 Pi_1^3 Pi_2,
-#
-# is not spot-checked here: Appendix A verifies the coefficients only.  The
-# identity is proved symbolically in (u,s) under subsection 4.4.1.
+# Point readers to the full factorisation check in sec4_4_1.py.
 print("note: the identity  Disc_xi d_{e,t} = 2^44 3^27 s^3 (u-1)^3 (u+3)^15")
-print("      (s-1)^15 Pi_1^3 Pi_2  is proved symbolically under subsection 4.4.1;")
-print("      this script checks the coefficients of Pi_1 and Pi_2 only.")
+print("      (s-1)^15 Pi_1^3 Pi_2  is verified symbolically in sec4_4_1.py;")
+print("      this script prints coefficient lists and checks degrees,")
+print("      extremal coefficients and boundary values.")
 print()
 
 report("Appendix A")

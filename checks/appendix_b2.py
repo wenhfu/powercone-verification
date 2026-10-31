@@ -4,11 +4,12 @@ Appendix B.2: exact base-point checks for Pi_2.
 
 Paper: Appendix B.2, equations (B.1)-(B.11).
 
-At the three base points u = 1/4, 1/2, 3/4 the polynomial 2^18 Pi_2(u, 1-q) is
-split into a cubic part h_i(q) and a tail whose coefficients are all
-nonnegative for q >= 0.  Each cubic has negative discriminant, positive leading
-coefficient and a positive value at q = 0, so each is positive for q >= 0;
-this gives Pi_2(u,s) > 0 for 0 <= s <= 1.
+For u = 1/4, 3/4, split 2^18 Pi_2(u,1-q) into 27 h_i(q) and a tail with
+nonnegative coefficients.  For u = 1/2, remove the strictly positive square
+factor in Pi_2(1/2,s) = -((2s-7)^2/512) R_7(s), then write -R_7(1-q) as
+h_0(q) plus such a tail.  Each cubic has negative discriminant, positive leading
+coefficient and positive value at 0, so it is positive for q >= 0.
+The decompositions prove Pi_2 > 0 on all three slices for 0 <= s <= 1.
 
 What is verified here
 ---------------------
@@ -60,10 +61,8 @@ check("(B.5)-(B.6)   h_2: Disc<0, LC>0, h_2(0)=361>0  =>  h_2(q)>0 for q>=0",
 print()
 
 # ---- u = 1/2 ---------------------------------------------------------
-# Here 2^18 Pi_2(1/2,.) has a double root at s = 7/2, which is removed by the
-# factor (2s-7)^2:  Pi_2(1/2,s) = -((2s-7)^2/512) R_7(s).  Writing q = 1 - s,
-# -R_7(1-q) splits into the cubic h_0(q) plus a tail with positive
-# coefficients.
+# Remove the double root at s = 7/2 using (2s-7)^2, strictly positive on [0,1].
+# With q = 1-s, -R_7(1-q) is h_0(q) plus a tail with positive coefficients.
 pi2_half = sp.expand(Pi2.subs(u, sp.Rational(1, 2)))
 R7_rec = sp.expand(sp.cancel(-512*pi2_half/(2*s - 7)**2))
 show_coeffs("R_7(s)", R7, s)

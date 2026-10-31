@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.0: nonnegativity of the binary sextic L(u,s).
+Preliminary reductions in Section 4.4: the leading-coefficient polynomial L(u,s).
 
-Paper: subsection 4.4.0, equations (4.13), (4.15), (4.17), (4.18), (4.20), (4.21).
+Paper: Section 4.4, before Subsection 4.4.1, equations (4.13), (4.15), (4.17),
+(4.18), (4.20), (4.21).
 
-Written as a polynomial in xi, d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 has leading
-coefficient
+The leading coefficient of d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 is
 
     [xi^6] d_{e,t} = 576 L(u,s),       u = e^2,  s = t^2,
 
-with L the binary sextic of (4.17).  The proof that d_{e,t} is positive uses the
-Bernstein representation of L on [0,1]^2.  The degenerate case t = 0 is treated
-separately by the paper (Lemma 4.2, (4.13)) and is checked here first.
+L has bidegree (3,3); the binary sextic is Delta(p,r) = Q^3 - P^2.
+The Bernstein representation of L proves L > 0 on (0,1)^2.  The case t = 0
+(Lemma 4.2, (4.13)) is checked separately.
 
 What is verified here
 ---------------------
@@ -34,7 +34,7 @@ Run:  python checks/sec4_4_0.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.0', '(4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21)')
+banner('Section 4.4', '(4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21)')
 
 
 def bern_coeffs(expr, du, ds):
@@ -44,8 +44,16 @@ def bern_coeffs(expr, du, ds):
     bidegree (i,j) is
 
         l_ij = sum_{k<=i, l<=j} a_kl * C(i,k)/C(du,k) * C(j,l)/C(ds,l).
+
+    Both requested degrees must be nonnegative integers and must bound the
+    degree of the polynomial in the corresponding variable.
     """
+    if any(not isinstance(degree, (int, sp.Integer)) or degree < 0
+           for degree in (du, ds)):
+        raise ValueError("Bernstein degrees must be nonnegative integers")
     P = sp.Poly(sp.expand(expr), u, s)
+    if P.degree(u) > du or P.degree(s) > ds:
+        raise ValueError("the polynomial degree exceeds the Bernstein bidegree")
     M = sp.zeros(du + 1, ds + 1)
     for i in range(du + 1):
         for j in range(ds + 1):
@@ -117,11 +125,9 @@ ell_pap = sp.Matrix([[81, 81, 81, 81],
 print("Bernstein coefficients of L(u,s), m=3 in u and in s:")
 sp.pprint(ell)
 check("(4.20)   Bernstein coefficient matrix (l_ij)", (ell - ell_pap).is_zero_matrix)
-# (4.21): L(u,s) > 0 for 0<u,s<1.  The paper's argument uses only the
-# first row of the matrix and the partition of unity,
-#     81 B_0^(3)(u) sum_j B_j^(3)(s) = 81(1-u)^3,
-# so it is enough to look at the Bernstein coefficients of L - 81(1-u)^3,
-# which are the last three rows above.
+# (4.21): the first row sums to 81 B_0^(3)(u) = 81(1-u)^3 by partition of
+# unity.  Subtracting it leaves the other three rows, all nonnegative,
+# proving L >= 81(1-u)^3 > 0 for 0<u,s<1.
 ell_rest = bern_coeffs(sp.expand(L_rec - 81*(1-u)**3), 3, 3)
 print("Bernstein coefficients of L(u,s) - 81(1-u)^3:")
 sp.pprint(ell_rest)
@@ -132,4 +138,4 @@ check("(4.21)   L(u,s) > 0 for 0<u,s<1   (all those coefficients >= 0)",
       all(v >= 0 for v in ell_rest))
 print()
 
-report("subsection 4.4.0")
+report("Section 4.4")

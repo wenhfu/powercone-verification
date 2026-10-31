@@ -5,10 +5,9 @@ subsection 4.4.3: the sign of Pi_2.
 Paper: subsection 4.4.3, with the auxiliary computations of Appendix B,
 equations (4.32), (4.33), (4.34), (4.37).
 
-Pi_2(u,s) is the degree-9 factor of Disc_xi d_{e,t}; its positivity on (0,1)^2
-is what makes the sign of the discriminant, and hence the upper bound,
-conclusive.  The argument uses the boundary values, the discriminant in s, and
-three exact base-point checks.
+The degree-9 factor Pi_2(u,s) is positive on (0,1)^2 by boundary values,
+the discriminant in s, and three exact base-point checks, together with the
+continuation argument of Lemma 4.3.
 
 What is verified here
 ---------------------
@@ -19,8 +18,8 @@ What is verified here
 * (4.34) : Disc_s Pi_2(u,.) != 0 for 0<u<1/2 and for 1/2<u<1, which is the
            hypothesis of Lemma 4.3 on the two halves; only (2u-1)^3 vanishes,
            at u = 1/2.
-* (4.37) : Pi_2(u,s) > 0 on (0,1)^2, certified by exact Hensel/Sturm root
-           counts of Pi_2(u0,.) on (0,1) for u0 = 1/4, 1/2, 3/4, and by the
+* (4.37) : Pi_2(u,s) > 0 on (0,1)^2, using exact root
+           counts of Pi_2(u0,.) on (0,1) for u0 = 1/4, 1/2, 3/4, and the
            Bernstein certificates for A_6 and A_7 above.
 
 Run:  python checks/sec4_4_3.py
@@ -39,8 +38,8 @@ check("(4.32)   Pi_2(u,1)", is_zero(b1 - u*(1-u)**6*(7*u+9)**2))
 print()
 
 # Bernstein coefficients of the two auxiliary factors A_6 and A_7 on the two
-# halves of [0,1]; they are needed because 1/2 is a root of the factor 2u-1, so
-# the coefficients are only certified half-interval by half-interval.
+# halves of [0,1], chosen to obtain positive coefficients on each subinterval.
+# The factor 2u-1 in Disc_s Pi_2 separately determines the continuation intervals.
 cA6a = bernstein_1d(A6, u, 0, sp.Rational(1, 2), 6)
 cA6b = bernstein_1d(A6, u, sp.Rational(1, 2), 1, 6)
 cA7a = bernstein_1d(A7, u, 0, sp.Rational(1, 2), 7)
@@ -55,11 +54,8 @@ show_factors("factor(Disc_s Pi_2)", Disc2)
 check("(4.33)   Disc_s Pi_2 factorisation", is_zero(sp.expand(Disc2 - Disc2_ref)))
 print()
 
-# (4.34): for 0 < u < 1 the only factor of the product above that can vanish is
-# (2u-1)^3, at u = 1/2: A_6 and A_7 are positive there (Bernstein certificates
-# above), and the remaining factors are positive powers of the bases u, u-1,
-# u+3, u+7, 7u+9, none of which has a root in either open interval.  This is
-# the hypothesis of Lemma 4.3.
+# (4.34): A_6, A_7 > 0 and the other bases have no roots in (0,1).
+# Only (2u-1)^3 vanishes there, at u = 1/2; Lemma 4.3 applies on each side.
 half = sp.Rational(1, 2)
 bases = [u, u - 1, u + 3, u + 7, 7*u + 9]
 crossing = [(b, rt) for b in bases
@@ -72,12 +68,9 @@ check("(4.34)   Disc_s Pi_2(u,.) != 0 for 0<u<1/2 and 1/2<u<1",
       and all(co > 0 for co in cA7a + cA7b))
 print()
 
-# (4.37): combine the ingredients into a single certificate.
-#   * the boundary values b0, b1 (positive on (0,1)),
-#   * A_6 > 0 and A_7 > 0 on [0,1] (all Bernstein coefficients positive),
-#   * the factorisation of Disc_s Pi_2,
-#   * exact root counts of Pi_2(u0,.) on (0,1) with a positive value at s = 0
-#     for the three base points u0 = 1/4, 1/2, 3/4.
+# (4.37): combine positive boundary values, Bernstein certificates for A_6, A_7,
+# the discriminant identity, and exact root counts with a positive value at
+# s = 0 for the base points u0 = 1/4, 1/2, 3/4.
 pi2_ok = []
 pi2_ok.append(silent(is_zero(b0 - 4*(u+3)**9)))
 pi2_ok.append(silent(is_zero(b1 - u*(1-u)**6*(7*u+9)**2)))

@@ -8,17 +8,17 @@ The base-point polynomial
 
     d_0(xi) = (729/2) * d_{1/3,1/2}(xi)
 
-is the specialisation of d_{e,t} at (e,t) = (1/3,1/2), scaled by the positive
-rational 729/2.  It is displayed explicitly as (4.39); its Sturm chain is
-analysed in Appendix C, where it is shown to have no real root.
+uses the positive scale 729/2, preserving signs and real roots.
 
 What is verified here
 ---------------------
 * The coefficients of d_0 against the explicit polynomial of (4.39).
 * Its constant term d_0(0) = 66199.
 
-The absence of real roots (and hence the strict positivity of d_{e,t} on the
-relevant domain) is then established in Appendix C from the Sturm chain.
+Appendix C proves that d_0 has no real root.  The general family d_{e,t}
+additionally requires the nonzero leading coefficient, nonvanishing
+discriminant and root continuation argument of Section 4.4.4; the base-point
+Sturm certificate alone does not cover the full parameter domain.
 
 Run:  python checks/sec4_4_4.py
 """
@@ -27,8 +27,7 @@ from _common import *
 reset_marks()
 banner('subsection 4.4.4', '(4.39)')
 
-# d_0 is defined as (729/2) * d_{1/3,1/2}; the multiplication by the positive
-# constant does not change the sign or the number of real roots.
+# Compare the derived base-point polynomial with (4.39).
 show_coeffs("d_0(xi) = (729/2)*d_{1/3,1/2}(xi)", d0, xi)
 check("(4.39)   d_0",
       sp.expand(d0 - (17914752*xi**6 - 5322240*xi**5 - 3190320*xi**4

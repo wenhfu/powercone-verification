@@ -13,35 +13,29 @@ The M-trace of T and the M-traceless part of T are
     tau_i = M^{jk} T_ijk,
     H_ijk = T_ijk - (1/4)( M_ij tau_k + M_ik tau_j + M_jk tau_i ).
 
-The M-inner product of (4.28),
+The M-inner product (4.28),
 
     <S,T>_M = M^{ia}M^{jb}M^{kc} S_ijk T_abc,
 
-is positive definite, because in an M-orthonormal basis it is the ordinary sum
-of products of tensor components.  Hence ||H||_M^2 > 0 whenever H != 0, and the
-sign of Pi_1 follows from two exact identities:
+is positive definite: in an M-orthonormal basis it is the ordinary component
+inner product.  For H != 0, the sign of Pi_1 follows from
 
     H_111     = A^3 (1-s)^3,                      (4.30)
     ||H||_M^2 = -Pi_1(u,s) / R(u,s)^3.            (4.29)
 
 What is verified here
 ---------------------
-* (4.10)    : det M = 12 (1-s)(u+3) R(u,s), with
-              R(u,s) = (u+3)^2 - 4u(u+3)s + 4u(1-u)s^2.  This is where R comes
-              from.
-* Lemma 4.1 : the sign analysis that the paper gives for R:  M_22 > 0,
-              dR/ds <= -4u(3u+1) < 0 on [0,1], R(u,1) = (1-u)(7u+9) > 0, hence
-              R(u,s) > 0 and det M > 0, so M is positive definite.
-* (4.24)    : H is M-traceless, M^{jk} H_ijk = 0, as constructed.
-* (4.30)    : H_111 = A^3 (1-s)^3.
-* (4.29)    : ||H||_M^2 = -Pi_1(u,s)/R(u,s)^3.
-* (4.31)    : Pi_1(u,s) < 0 for 0<u,s<1, the paper's conclusion, from H != 0,
-              ||H||_M^2 > 0 (M positive definite) and R > 0.
+* (4.10): det M = 12(1-s)(u+3)R, where
+  R = (u+3)^2 - 4u(u+3)s + 4u(1-u)s^2.
+* Lemma 4.1: M_22 > 0, dR/ds <= -4u(3u+1) < 0 on [0,1], and
+  R(u,1) = (1-u)(7u+9) > 0; hence R > 0 and M is positive definite.
+* (4.24)-(4.25): H is M-traceless, M^{jk}H_ijk = 0.
+* (4.29)-(4.31): the two identities above and their consequence Pi_1 < 0
+  for 0<u,s<1, using H != 0 and R > 0.
 
 How M^{-1} is handled
 ---------------------
-Instead of inverting M symbolically, everything is multiplied through by
-det(M).  With Adj = det(M) * M^{-1} the adjugate and
+Use the adjugate Adj = det(M) * M^{-1} and clear denominators:
 
     S_i = Adj_jk T_ijk = det(M) tau_i,
     G_ijk = det(M) H_ijk,
@@ -54,27 +48,24 @@ and, since det(M) = cc * R with cc = 12(1-s)(u+3),
 
     ||H||_M^2 = -Pi_1/R^3   <=>   N = -Pi_1 cc^3 det(M)^2.
 
-Both sides of the last identity are polynomials, so the comparison is exact and
-involves no rational-function simplification.
+The last identity is checked as a polynomial equality.
 
 The alternative variables
 -------------------------
-Every quantity below is even in the barrier parameter e and in the slice
-parameter t separately, so it is written in
+The coefficients are invariant under (e,t) -> (-e,-t).  Every monomial has
+exponents of the same parity and can be expressed using
 
     u = e^2,  s = t^2,  w = e*t,   subject to  w^2 = u*s.
 
-Each of Q and P contributes only even-even or odd-odd monomials, which is why
-this rewriting is faithful; working in (u,s,w) instead of (e,t) halves the
-degrees and keeps the expansion small.  The relation w^2 = u*s is applied by
-reduce_w().
+This reduces degrees and keeps expansions small.  reduce_w() applies w^2 = u*s;
+to_usw() checks parity and verifies the conversion by reverse substitution.
 
 Run:  python checks/sec4_4_2.py
 """
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.2', '(4.10), Lemma 4.1, (4.24), (4.29)-(4.31)')
+banner('subsection 4.4.2', '(4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)')
 
 # w stands for the product e*t; see the module docstring.
 w = sp.Symbol("w", positive=True)
@@ -86,15 +77,22 @@ def to_usw(g):
     Every monomial of ``g`` must have exponents of the same parity in e and in
     t, so that it is either even-even (mapped to a polynomial in u and s) or
     odd-odd (mapped to w times such a polynomial).
+    Invalid parity raises ValueError even with Python -O.  Reverse substitution
+    verifies the converted polynomial exactly before it is returned.
     """
+    original = sp.expand(g)
     out = 0
-    for (i, j), co in sp.Poly(sp.expand(g), e, t).terms():
-        assert i % 2 == j % 2, "monomial e^%d t^%d is not parity-homogeneous" % (i, j)
+    for (i, j), co in sp.Poly(original, e, t).terms():
+        if i % 2 != j % 2:
+            raise ValueError("monomial e^%d t^%d has mismatched parity" % (i, j))
         if i % 2 == 0:
             out += co*u**(i//2)*s**(j//2)
         else:
             out += co*w*u**((i-1)//2)*s**((j-1)//2)
-    return sp.expand(out)
+    converted = sp.expand(out)
+    if sp.expand(converted.subs({u: e**2, s: t**2, w: e*t}) - original) != 0:
+        raise ArithmeticError("reverse substitution failed in to_usw")
+    return converted
 
 
 def reduce_w(g):
@@ -162,16 +160,15 @@ check("(4.10)   det M = 12(1-s)(u+3)R(u,s)",
       sp.expand(D - cc*R) == 0)
 print()
 
-# (4.24): M^{jk} H_ijk = 0 is equivalent to Adj_jk G_ijk = 0.
+# (4.24)-(4.25): M^{jk} H_ijk = 0 is equivalent to Adj_jk G_ijk = 0.
 mtrace = [reduce_w(sum(Adj[j-1, k-1]*G(i, j, k) for j in (1, 2) for k in (1, 2)))
           for i in (1, 2)]
-check("(4.24)   H is M-traceless: M^{jk}H_ijk = 0",
+check("(4.24)-(4.25)   H is M-traceless: M^{jk}H_ijk = 0",
       mtrace == [0, 0])
 print()
 
-# (4.30): H_111 = G_111 / det(M).  Here tau_1 = 0 identically, that is, the
-# M-trace of T vanishes in the p-direction, so the correction term of (4.25)
-# contributes nothing and H_111 = T_111 = A^3(1-s)^3.
+# (4.30): tau_1 = 0, so the correction in (4.25) vanishes and
+# H_111 = G_111 / det(M) = T_111 = A^3(1-s)^3.
 H111 = sp.factor(sp.cancel(G(1, 1, 1)/D))
 print("H_111 =", H111)
 check("(4.30)   H_111 = A^3(1-s)^3",
@@ -190,11 +187,7 @@ check("(4.29)   ||H||_M^2 = -Pi_1(u,s)/R(u,s)^3",
 print()
 
 # ----------------------------------------------------------------------
-# Lemma 4.1 (positive definiteness of Q) and (4.31).
-#
-# The identity above turns into a statement about the sign of Pi_1 only once
-# R(u,s) > 0 and the M-inner product is known to be positive definite; both
-# come from Lemma 4.1, whose proof is reproduced here step by step.
+# Lemma 4.1: R > 0 and M positive definite, needed for the sign of Pi_1.
 # ----------------------------------------------------------------------
 dR = sp.diff(R, s)
 print("M_22    =", sp.factor(M[1, 1]))
@@ -206,10 +199,8 @@ check("Lemma 4.1   dR/ds = -4u(3u+1) - 8u(1-u)(1-s)",
       sp.expand(dR + 4*u*(3*u + 1) + 8*u*(1 - u)*(1 - s)) == 0)
 check("Lemma 4.1   R(u,1) = (1-u)(7u+9)",
       sp.expand(R.subs(s, 1) - (1 - u)*(7*u + 9)) == 0)
-# Those three facts give dR/ds <= -4u(3u+1) < 0 on 0<=s<=1 and
-# R(u,s) >= R(u,1) = (1-u)(7u+9) > 0 for 0<u<1; together with the identity of
-# (4.10) this gives det M > 0, and with M_22 > 0 the matrix M is positive
-# definite, which is the content of Lemma 4.1.
+# For 0<u,s<1, dR/ds < 0 gives R(u,s) >= R(u,1) > 0.
+# Thus det M > 0 by (4.10); with M_22 > 0 this proves M positive definite.
 qpd = (sp.expand(M[1, 1] - 4*(4*u*s + 3*u + 9)) == 0
        and sp.expand(dR + 4*u*(3*u + 1) + 8*u*(1 - u)*(1 - s)) == 0
        and sp.expand(R.subs(s, 1) - (1 - u)*(7*u + 9)) == 0

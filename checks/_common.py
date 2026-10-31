@@ -1,70 +1,45 @@
 ﻿# -*- coding: utf-8 -*-
 """
-Shared infrastructure for the symbolic verification of the upper-bound
-algebra of
+Shared symbols and helpers for the upper-bound algebra of
 
     "The optimal barrier parameter of the three-dimensional power cone"
 
-(subsection 4.3, subsection 4.4 and Appendices A-C).
+(Sections 4.3-4.4 and Appendices A-C).
 
-The checks cover the algebraic claims of that scope: identities, factorisations
-and sign certificates.  The steps of the proof that are not algebraic (the
-real-root continuation of Lemmas 2.4 and 4.3, the Sylvester step of Lemma 4.1,
-and the passage from an identity to a sign statement) remain the paper's own
-arguments.  Everything is computed in exact (rational / polynomial) arithmetic,
-and every equality verdict is decided by exact normalisation (see ``is_zero``),
-never by a heuristic simplification.
+The checks verify identities, factorisations and sign certificates.  Root
+continuation (Lemmas 2.4 and 4.3), the Sylvester step (Lemma 4.1), and the
+arguments turning identities into sign statements remain in the paper.
+Logarithms and symbolic powers are differentiated exactly; final verdicts use
+exact rational and polynomial arithmetic.  Equality checks use normalisation
+(see ``is_zero``), without heuristic simplification or floating-point sampling.
 
 What this module provides
 -------------------------
-* Verdict tracking  : ``check``, ``silent``, ``banner``, ``reset_marks``,
-                      ``report``.
-* Exact decisions   : ``is_zero``, the zero test behind every equality verdict,
-                      and ``clear_denominator``, an exact, remainder-checked
-                      division.
-* Text output       : ``show_coeffs``, ``show_factors``, ``num_factor_str``,
-                      ``pat`` (plain text; polynomials are never rendered with
-                      multi-line ``pprint``).
-* Exact / interval  : ``primitive_int``, ``roots_in_unit``, ``bernstein_1d``
-                      (used for the sign certificates).
-* The symbols, the barrier ``f_e`` of (4.3) and all quantities derived from it,
-  together with the explicit factors ``Pi_1``, ``Pi_2`` of Appendix A and the
-  auxiliary polynomials of Appendix B.
+* Verdict recording and reporting, and helpers for compound checks.
+* Exact zero tests, polynomial division, Sturm counts and Bernstein coefficients.
+* Printing helpers for coefficients, factors and sign patterns.
+* The barrier ``f_e`` of (4.3), its derived quantities, and the encoded
+  polynomials of Appendices A and B.
 
 Output policy
 -------------
-Only values computed by SymPy are printed.  The paper's formulas enter only
-through the verdict, which names the equation being checked and reduces the
-expression to a short handle, so the output has the form
-
-    <value computed by SymPy>
-       verified   <equation>   <expression>
-
-in which every computed value can be read off, line by line, against the
-corresponding displayed formula of the paper.
+Computed expressions and encoded coefficient lists are printed for comparison
+with the paper.  Printing an encoded list does not independently verify its
+entries.  Each group has a verdict identifying the equation or appendix; each
+script's documentation distinguishes checked claims from displayed data.
 
 Usage
 -----
-This module is imported by the checks; it is not meant to be run on its own.  It
-is where the shared symbols, the barrier, the auxiliary polynomials, and the
-printing, Sturm and Bernstein helpers live.
-
-Each ``appendix_*.py`` / ``sec*_*.py`` script opens with ``banner(<section>,
-<formulas>)`` and closes with ``report(<section>)``, so every run states which
-part of the paper and which equation numbers it covers.  A script therefore
-runs standalone
-
-    python checks/sec4_4_0.py
-
-and the whole suite can be driven by ``python run_all.py``.
+Import this module from the checks.  Each script uses ``banner`` and ``report``
+to identify its scope and verdicts.  Run one with ``python checks/sec4_4_0.py``
+or the whole suite with ``python run_all.py``.
 """
 import sys
 from math import comb
 
 import sympy as sp
 
-# Make UTF-8 output work when the scripts are launched from a Windows console
-# whose default code page is not UTF-8.
+# Use UTF-8 output in Windows consoles with other default encodings.
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -74,8 +49,7 @@ except Exception:
 # ----------------------------------------------------------------------
 # Verdict bookkeeping
 # ----------------------------------------------------------------------
-# Field widths of the OVERALL line: the bracketed section, then the verdict.
-# They keep the parts of a run_all.py report aligned.
+# Field widths aligning the section and verdict in OVERALL summaries.
 SUMMARY_WIDTH = 20
 VERDICT_WIDTH = 4
 ok_marks = []      # (name, passed) pairs collected by the running script
@@ -85,12 +59,9 @@ current_formulas = None   # equation numbers checked by the current script
 
 
 def check(name, cond):
-    """Record one verdict and print "verified   <equation>   <expression>".
+    """Record a verdict and print ``verified`` or ``FAILED`` followed by its name.
 
-    The line opens with the verdict, ``verified`` (or ``FAILED`` when the check
-    does not hold), and then gives the equation that was checked together with a
-    short handle for the expression.  The verdict comes first, so that the lines
-    of a script line up under one another.
+    The name identifies the equation and expression being checked.
     """
     ok_marks.append((name, bool(cond)))
     print("   %s   %s" % (("verified" if cond else "FAILED").ljust(8), name))
@@ -98,26 +69,21 @@ def check(name, cond):
 
 
 def silent(cond):
-    """Same as check(), but silent: an ingredient of a compound verdict.
+    """Convert an ingredient of a compound verdict to bool.
 
-    Several elementary facts are often combined into a single printed line, so
-    that the list of verdicts stays readable.
+    This helper neither records nor prints a verdict.
     """
     return bool(cond)
 
 
 def banner(section, formulas=None):
-    """Announce the part of the paper covered by the current script.
-
-    Prints a header naming the section and the equation numbers, and stores both
-    so that the closing summary carries the same numbers.
-    """
+    """Print the section and equation numbers, saving them for the summary."""
     global current_section, current_formulas
     current_section = section
     current_formulas = formulas
     print("=" * 72)
     print("Checking %s%s" % (section, (": " + formulas) if formulas else ""))
-    print("only SymPy-computed values are printed; compare them with the paper")
+    print("symbolic values and encoded coefficients; compare them with the paper")
     print("=" * 72)
     print()
 
@@ -153,19 +119,13 @@ def report(section):
 
 
 # ----------------------------------------------------------------------
-# Printing helpers
-# (everything printed here is computed by SymPy; nothing is copied from the
-# paper)
+# Printing helpers (computed expressions or encoded coefficient lists)
 # ----------------------------------------------------------------------
 def show_coeffs(name, expr, *vars):
     """Print a polynomial one coefficient per line.
 
-    ``expr`` is expanded and read as a polynomial in ``vars``.  With a single
-    variable the coefficients run from the leading term down to the constant;
-    with several variables they are listed in descending monomial order.  A
-    coefficient that still depends on other symbols is printed in factored form,
-    while a pure number is printed as it stands, which is how the paper writes
-    the two kinds of coefficients.
+    Expand ``expr`` in ``vars`` and list coefficients in descending degree or
+    monomial order.  Symbolic coefficients are factored; numbers are unchanged.
     """
     P = sp.Poly(sp.expand(expr), *vars)
 
@@ -231,13 +191,10 @@ def pat(v):
 # Exact / interval helpers
 # ----------------------------------------------------------------------
 def is_zero(expr):
-    """True if and only if ``expr`` is identically zero: an exact decision.
+    """Test an algebraic identity by exact normalisation.
 
-    The expression is first put over a common denominator (``sp.cancel``) and
-    the numerator is then expanded, so the verdict follows from polynomial
-    normalisation.  ``sp.simplify`` is never used as a criterion: it is a
-    heuristic that looks for a simpler expression and may fail to prove an
-    identity that does hold.
+    Apply ``sp.cancel`` and expand the numerator.  This avoids ``sp.simplify``,
+    whose heuristic search need not prove an identity that holds.
     """
     num, den = sp.fraction(sp.cancel(expr))
     if sp.expand(den) == 0:
@@ -246,15 +203,10 @@ def is_zero(expr):
 
 
 def clear_denominator(expr, *vars):
-    """Exact quotient of a rational expression by its own denominator.
+    """Convert a rational expression to a polynomial by exact division.
 
-    ``expr`` is combined over a single denominator, and the numerator is then
-    divided by that denominator in the polynomial ring ``Q[vars]``.  The
-    remainder is checked to vanish, so the division proves that the denominator
-    divides the numerator and that the result is a genuine polynomial.  This is
-    how the normalising factors of (4.6) and (4.8), including the minus sign
-    in the cubic relation, are cleared in exact arithmetic rather than by a
-    heuristic simplification.
+    Combine ``expr`` over one denominator, divide in ``Q[vars]``, and reject a
+    nonzero remainder.  Used to remove the normalising factors of (4.6), (4.8).
     """
     num, den = sp.fraction(sp.together(expr))
     q, rem = sp.div(sp.Poly(sp.expand(num), *vars),
@@ -306,10 +258,15 @@ def bernstein_1d(p_expr, var, lo, hi, m):
 
     The polynomial is first pulled back to the unit interval by
     ``var = lo + (hi-lo)*v``.  If every returned coefficient is positive, then
-    the polynomial is positive on the whole interval.
+    the polynomial is positive on the whole interval.  The requested degree
+    must be a nonnegative integer at least as large as the pulled-back degree.
     """
+    if not isinstance(m, (int, sp.Integer)) or m < 0:
+        raise ValueError("the Bernstein degree must be a nonnegative integer")
     v = sp.Symbol("v")
     Qv = sp.Poly(sp.expand(p_expr.subs(var, lo + (hi - lo)*v)), v)
+    if Qv.degree() > m:
+        raise ValueError("the polynomial degree exceeds the Bernstein degree")
     return [sp.expand(sum(Qv.coeff_monomial(v**k)*sp.Rational(comb(i, k), comb(m, k))
                          for k in range(i + 1))) for i in range(m + 1)]
 
@@ -317,9 +274,8 @@ def bernstein_1d(p_expr, var, lo, hi, m):
 # ----------------------------------------------------------------------
 # Symbols
 # ----------------------------------------------------------------------
-# e is the barrier parameter kept free in subsection 4.3; t parametrises the
-# slice (X,Z) = (1,t); p and r are the components of the tangent direction h;
-# xi is the variable used for the univariate specialisations.
+# e is the free parameter; t selects the slice (X,Z) = (1,t).
+# p, r are direction coordinates; xi is the univariate specialisation variable.
 e, t, p, r, xi = sp.symbols("e t p r xi", positive=True)
 # Primal variables of the power-cone barrier f_e.
 X, Z = sp.symbols("X Z", positive=True)
@@ -333,8 +289,7 @@ c = (1 - e)/2     # offset of the affine slice Z = c*t*p + r
 
 
 # ----------------------------------------------------------------------
-# The barrier f_e of (4.3) and every quantity derived from it.
-# They are inputs to the checks and are never printed.
+# The barrier f_e of (4.3) and its derived quantities.
 # ----------------------------------------------------------------------
 f = -(3-e)/6*sp.log(X) - (9-e**2)/(6*A)*sp.log(1 - Z**2/X**(1-e))
 
@@ -353,11 +308,9 @@ D3f = fxxx*hX**3 + 3*fxxz*hX**2*hZ + 3*fxzz*hX*hZ**2 + fzzz*hZ**3
 Ghh = (fxx - fx**2)*hX**2 + 2*(fxz - fx*fz)*hX*hZ + (fzz - fz**2)*hZ**2
 Tfff = D3f - 6*D2f*Df + 4*Df**3
 
-# Closed forms of (4.7) and (4.9), obtained from G[h,h] and T_f[h,h,h] on the
-# slice (X,Z) = (1,t) after clearing the normalising factors, including the
-# minus sign in the cubic relation.  The clearing is an exact,
-# remainder-checked polynomial division (never
-# sp.simplify), so Q_der and P_der are the genuine polynomials of (4.7) / (4.9).
+# Recover Q and P of (4.7), (4.9) from G[h,h] and T_f[h,h,h] on (X,Z) = (1,t).
+# Remove the normalising factors of (4.6), (4.8), including the cubic minus
+# sign, by exact polynomial division with a zero-remainder check.
 Q_der = clear_denominator(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2),
                           e, t, p, r)
 P_der = clear_denominator(Tfff.subs({X: 1, Z: t})

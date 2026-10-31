@@ -5,21 +5,21 @@ Appendix B.1: positivity of the auxiliary factors A_6 and A_7.
 Paper: Appendix B.1 (the definitions of A_6 and A_7, and the Bernstein
 coefficient lists that follow them).
 
-A_6 and A_7 are the two nontrivial factors of Disc_s Pi_2 (see
-subsection 4.4.3).  Both are shown to be positive on [0,1] by exhibiting their
-Bernstein coefficients: all of them are positive.
+A_6 and A_7 are factors of Disc_s Pi_2 (subsection 4.4.3).  Positive Bernstein
+coefficients on each half of [0,1] certify their positivity.
 
 What is verified here
 ---------------------
-* The coefficient lists of A_6(u) and A_7(u), against the definitions in
-  Appendix B.1.
+* The encoded power-basis coefficient lists of A_6(u) and A_7(u) are displayed
+  for comparison with Appendix B.1; they are not compared with a second set of
+  power-basis targets here.
 * The Bernstein coefficients of A_6(v/2), A_6((1+v)/2), A_7(v/2) and
   A_7((1+v)/2), against the four lists printed in Appendix B.1.
-* The positivity of A_6 and A_7 on [0,1], which follows from the positivity of
-  every Bernstein coefficient on each half-interval.
+* Positivity of all four lists, proving A_6, A_7 > 0 on [0,1].
 
-The interval is split at 1/2 because 2u-1 appears as a factor of Disc_s Pi_2;
-each half is then treated separately.
+The split at 1/2 produces positive Bernstein coefficients; neither polynomial
+vanishes there.  The factor 2u-1 in Disc_s Pi_2 separately determines the
+continuation intervals.
 
 Run:  python checks/appendix_b1.py
 """
@@ -33,9 +33,7 @@ show_coeffs("A_6(u)", A6, u)
 show_coeffs("A_7(u)", A7, u)
 print()
 
-# Bernstein coefficients of A_6 and A_7 of the proper degree on each half of
-# [0,1]; the change of variable u = v/2 (respectively u = (1+v)/2) maps [0,1]
-# onto that half-interval.
+# Pull each half-interval back to [0,1] by u = v/2 or u = (1+v)/2.
 cA6a = bernstein_1d(A6, u, 0, sp.Rational(1, 2), 6)
 cA6b = bernstein_1d(A6, u, sp.Rational(1, 2), 1, 6)
 cA7a = bernstein_1d(A7, u, 0, sp.Rational(1, 2), 7)

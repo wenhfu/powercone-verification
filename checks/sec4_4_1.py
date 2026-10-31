@@ -22,8 +22,9 @@ What is verified here
   the right-hand side above.
 
 This is the most expensive computation of the suite, and the only place where
-the identity itself is checked: the Appendix A check verifies the coefficients
-of Pi_1 and Pi_2, not the identity.
+the full discriminant factorization is checked.  The Appendix A script prints
+the encoded coefficient lists and checks degrees, extremal coefficients and
+boundary values; it does not independently compare every coefficient.
 
 Run:  python checks/sec4_4_1.py
 """

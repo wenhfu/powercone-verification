@@ -2,13 +2,11 @@
 """
 Appendix C: the exact Sturm chain of the base-point polynomial d_0.
 
-Paper: Appendix C, together with (4.39) of
-subsection 4.4.4.
+Paper: Appendix C and (4.39) of subsection 4.4.4.
 
-Starting from S_0 = d_0 and S_1 = d_0', the Sturm chain is built by taking
-negative Euclidean remainders repeatedly.  The paper prints a rescaled version
-of the chain, in which every member is multiplied by a positive constant; such a
-rescaling changes no sign and therefore no Sturm count.
+Build the Sturm chain from d_0 and d_0' by negative Euclidean remainders.
+Positive rescaling to the paper's integer coefficients preserves signs and
+Sturm counts.
 
 What is verified here
 ---------------------
@@ -26,9 +24,7 @@ from _common import *
 reset_marks()
 banner('Appendix C', 'Sturm chain of d_0 of (4.39), Appendix C')
 
-# SymPy returns the chain; primitive_int() rescales each member by a positive
-# rational so that its coefficients are coprime integers, exactly as the paper
-# does when printing S_0..S_6.
+# Compute the chain and normalise it as in Appendix C.
 st = [g.as_expr() for g in sp.sturm(sp.Poly(d0, xi))]
 S_int = [primitive_int(g, xi) for g in st]
 print("Sturm chain of d_0, each member rescaled by a positive constant to a")
