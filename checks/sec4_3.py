@@ -2,25 +2,8 @@
 """
 subsection 4.3: the quadratic form Q and the cubic form P.
 
-Paper: subsection 4.3, equations (4.7) and (4.9).
-
-For the power-cone barrier f_e of (4.3) the paper derives closed forms for
-the quadratic and the cubic form
-
-    G[h,h] = (9-e^2)/(36 A^2 (1-t^2)^2) * Q(p,r),         (4.6)
-    T_f[h,h,h] = -e(9-e^2)/(54 A^3 (1-t^2)^3) * P(p,r),   (4.8)
-
-on the slice (X,Z) = (1,t), where A = e^2 + 3 and
-h = p*d/dX + (c*t*p + r)*d/dZ.  The normalized polynomials Q and P
-are given in (4.7) and (4.9), respectively.
-
-What is verified here
----------------------
-* The coefficients of Q(p,r) and P(p,r), derived from f_e by symbolic
-  differentiation and checked against the closed forms of (4.7) and (4.9).
-
-Every coefficient is printed in factored form, so that it can be compared with
-the compact factors used in the paper.
+Derives Q and P from f_e by differentiation using (4.6) and (4.8),
+then checks the coefficients against (4.7) and (4.9).
 
 Run:  python checks/sec4_3.py
 """
@@ -31,12 +14,7 @@ banner('subsection 4.3', '(4.7), (4.9)')
 
 
 def show_factor_coeffs(name, expr, *vars):
-    """Print the coefficients of ``expr``, one per monomial, in factored form.
-
-    Unlike ``show_coeffs``, this also factors coefficients that are pure
-    numbers, because subsection 4.3 compares its coefficients with the product
-    form in which (4.7) and (4.9) are written.
-    """
+    """Print polynomial coefficients in factored form, including numeric coefficients."""
     P = sp.Poly(sp.expand(expr), *vars)
     print("%s   (total degree %d, coefficients factored):"
           % (name, P.total_degree()))
@@ -45,7 +23,7 @@ def show_factor_coeffs(name, expr, *vars):
         print("   [%s] = %s" % (tag, sp.factor(co)))
 
 
-# Closed forms of (4.7) and (4.9), transcribed as they appear in the paper.
+# Q and P as given in (4.7) and (4.9).
 Q_pap = ((1-t**2)*A*(A-4*e**2*t**2)*p**2
          + 8*e*t*A*(1-t**2)*p*r
          + 4*(4*e**2*t**2+3*e**2+9)*r**2)
@@ -54,12 +32,7 @@ P_pap = (A**3*(1-t**2)**3*p**3
          - 12*A*(1-t**2)*(3*A+t**2*(5*e**2-9))*p*r**2
          - 16*e*t*(9*A+t**2*(5*e**2-9))*r**3)
 
-# Q_der and P_der come from the contractions
-#     G[h,h]    = (f_xx - f_x^2) h_X^2 + 2 (f_xz - f_x f_z) h_X h_Z
-#                 + (f_zz - f_z^2) h_Z^2,
-#     T_f[h,h,h] = D^3 f[h,h,h] - 6 D^2 f[h,h] <grad f,h> + 4 <grad f,h>^3,
-# evaluated on the slice (X,Z) = (1,t), then normalized using (4.6) and (4.8),
-# including the minus sign for P.
+# Q_der and P_der are computed from f_e in _common.py using (4.6) and (4.8).
 show_factor_coeffs("Q(p,r) recomputed from G[h,h] of f_e", Q_der, p, r)
 check("(4.7)   Q(p,r)", is_zero(Q_der - Q_pap))
 print()

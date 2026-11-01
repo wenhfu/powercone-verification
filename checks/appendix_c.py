@@ -2,20 +2,9 @@
 """
 Appendix C: the exact Sturm chain of the base-point polynomial d_0.
 
-Paper: Appendix C and (4.39) of subsection 4.4.4.
-
-Build the Sturm chain from d_0 and d_0' by negative Euclidean remainders.
-Positive rescaling to the paper's integer coefficients preserves signs and
-Sturm counts.
-
-What is verified here
----------------------
-* The seven members S_0..S_6, rescaled to primitive integer polynomials, against
-  the chain printed in Appendix C.
-* The signs of the chain at -oo and +oo, hence V(-oo) = V(+oo) = 3, which by
-  Sturm's theorem means that d_0 has no real root, so that d_0 is strictly
-  positive (d_0(0) = 66199 > 0).
-* The same conclusion, independently, from an exact root count.
+Checks the Sturm chain against Appendix C, its signs at -oo and +oo,
+and V(-oo) = V(+oo) = 3. Also verifies that d_0 of (4.39) has no
+real roots by exact root counting.
 
 Run:  python checks/appendix_c.py
 """
@@ -55,11 +44,7 @@ print()
 
 
 def _signs_at(m):
-    """Signs of the chain members at m = -oo or m = +oo.
-
-    At +oo the sign of a polynomial is the sign of its leading coefficient; at
-    -oo it is that sign multiplied by (-1)^degree.
-    """
+    """Return the signs of the Sturm chain at m = -oo or +oo."""
     out = []
     for g in S_int:
         Pg = sp.Poly(g, xi)
@@ -74,7 +59,7 @@ def _var(v):
     return sum(1 for i in range(len(sv)-1) if sv[i] != sv[i+1])
 
 
-# Sturm's theorem: the number of distinct real roots in (a,b] is V(a) - V(b).
+# Sturm's theorem: V(-oo) - V(+oo) counts the distinct real roots of d_0.
 vm, vp = _signs_at(-sp.oo), _signs_at(sp.oo)
 print("signs of the Sturm chain at -oo :", pat(vm))
 print("signs of the Sturm chain at +oo :", pat(vp))

@@ -1,33 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
 """
-Shared symbols and helpers for the upper-bound algebra of
+Shared symbols and helpers for Sections 4.3-4.4 and Appendices A-C.
 
-    "The optimal barrier parameter of the three-dimensional power cone"
-
-(Sections 4.3-4.4 and Appendices A-C).
-
-The checks verify identities, factorisations and sign certificates.  Root
-continuation (Lemmas 2.4 and 4.3), the Sylvester step (Lemma 4.1), and the
-arguments turning identities into sign statements remain in the paper.
-Logarithms and symbolic powers are differentiated exactly; final verdicts use
-exact rational and polynomial arithmetic.  Equality checks use normalisation
-(see ``is_zero``), without heuristic simplification or floating-point sampling.
-
-What this module provides
--------------------------
-* Verdict recording and reporting, and helpers for compound checks.
-* Exact zero tests, polynomial division, Sturm counts and Bernstein coefficients.
-* Printing helpers for coefficients, factors and sign patterns.
-* The barrier ``f_e`` of (4.3), its derived quantities, and the encoded
-  polynomials of Appendices A and B.
-
-Output policy
--------------
-Computed expressions and encoded coefficient lists are printed for comparison
-with the paper.  Printing an encoded list does not independently verify its
-entries.  Each group has a verdict identifying the equation or appendix; each
-script's documentation distinguishes checked claims from displayed data.
-
+Defines f_e in (4.3), its derivatives, and the polynomials of Appendices A-B.
+Provides exact polynomial checks, Bernstein coefficients, root counts,
+and helpers for printing and reporting.
 """
 import sys
 from math import comb
@@ -42,7 +19,7 @@ except Exception:
 
 
 # ----------------------------------------------------------------------
-# Verdict bookkeeping
+# Check reporting
 # ----------------------------------------------------------------------
 # Field widths aligning the section and verdict in OVERALL summaries.
 SUMMARY_WIDTH = 20
@@ -54,20 +31,14 @@ current_formulas = None   # equation numbers checked by the current script
 
 
 def check(name, cond):
-    """Record a verdict and print ``verified`` or ``FAILED`` followed by its name.
-
-    The name identifies the equation and expression being checked.
-    """
+    """Record the check and print its name with ``verified`` or ``FAILED``."""
     ok_marks.append((name, bool(cond)))
     print("   %s   %s" % (("verified" if cond else "FAILED").ljust(8), name))
     return bool(cond)
 
 
 def silent(cond):
-    """Convert an ingredient of a compound verdict to bool.
-
-    This helper neither records nor prints a verdict.
-    """
+    """Convert a condition to bool without recording or printing a check."""
     return bool(cond)
 
 
@@ -113,18 +84,17 @@ def report(section):
 
 
 # ----------------------------------------------------------------------
-# Printing helpers (computed expressions or encoded coefficient lists)
+# Printing helpers
 # ----------------------------------------------------------------------
 def show_coeffs(name, expr, *vars):
-    """Print a polynomial one coefficient per line.
+    """Print coefficients in descending degree or monomial order.
 
-    Expand ``expr`` in ``vars`` and list coefficients in descending degree or
-    monomial order.  Symbolic coefficients are factored; numbers are unchanged.
+    Factor symbolic coefficients and leave numeric coefficients unchanged.
     """
     P = sp.Poly(sp.expand(expr), *vars)
 
     def fac(c):
-        # Factor genuine polynomials; leave integer/rational constants alone.
+        # Factor symbolic coefficients; leave numeric constants unchanged.
         return c if c.is_number else sp.factor(c)
 
     if len(vars) == 1:
@@ -140,11 +110,7 @@ def show_coeffs(name, expr, *vars):
 
 
 def num_factor_str(n):
-    """Write a rational number as a product of prime powers, as the paper does.
-
-    For instance 134150929655722049475182592 becomes '(2)^(44)*(3)^(27)', and
-    -4096 becomes '(-1)*(2)^(12)'.
-    """
+    """Format a nonzero rational number as a product of prime powers."""
     n = sp.Rational(n)
     parts = []
     if n < 0:
@@ -159,12 +125,7 @@ def num_factor_str(n):
 
 
 def show_factors(name, expr):
-    """Print a factorisation, one factor per line.
-
-    SymPy keeps the rational constant as an ordinary numeric factor; it is
-    expanded into prime powers here, so that it can be read off against the
-    paper's forms, such as 2^44 * 3^27.
-    """
+    """Print one factor per line, writing numeric constants as prime powers."""
     print("%s :" % name)
     for g in sp.Mul.make_args(sp.factor(expr)):
         if g.is_number:
@@ -182,14 +143,10 @@ def pat(v):
 
 
 # ----------------------------------------------------------------------
-# Exact / interval helpers
+# Exact polynomial calculations
 # ----------------------------------------------------------------------
 def is_zero(expr):
-    """Test an algebraic identity by exact normalisation.
-
-    Apply ``sp.cancel`` and expand the numerator.  This avoids ``sp.simplify``,
-    whose heuristic search need not prove an identity that holds.
-    """
+    """Test whether the numerator vanishes after rational cancellation."""
     num, den = sp.fraction(sp.cancel(expr))
     if sp.expand(den) == 0:
         raise ZeroDivisionError("is_zero(): vanishing denominator")
@@ -197,11 +154,7 @@ def is_zero(expr):
 
 
 def clear_denominator(expr, *vars):
-    """Convert a rational expression to a polynomial by exact division.
-
-    Combine ``expr`` over one denominator, divide in ``Q[vars]``, and reject a
-    nonzero remainder.  Used to remove the normalising factors of (4.6), (4.8).
-    """
+    """Divide the numerator by the denominator and reject a nonzero remainder."""
     num, den = sp.fraction(sp.together(expr))
     q, rem = sp.div(sp.Poly(sp.expand(num), *vars),
                     sp.Poly(sp.expand(den), *vars))
@@ -221,12 +174,9 @@ def _gcd(seq):
 
 
 def primitive_int(g, var):
-    """Rescale ``g`` by a *positive* rational so that its coefficients become
-    coprime integers.
+    """Rescale a nonzero rational polynomial to coprime integer coefficients.
 
-    Multiplying a Sturm chain by a positive constant changes no sign, and hence
-    no Sturm count; this is the normalisation used in Appendix C to make the
-    chain readable.
+    Use a positive scale to preserve signs in the Sturm chain of Appendix C.
     """
     Pg = sp.Poly(sp.expand(g), var)
     nums, dens = [], []
@@ -238,22 +188,15 @@ def primitive_int(g, var):
 
 
 def roots_in_unit(p_expr, u_val):
-    """Exact number of roots of ``p_expr(u_val, s)`` on the interval [0,1].
-
-    ``sp.Poly.count_roots(0, 1)`` takes the endpoints into account as well, so a
-    count of 0 certifies that the polynomial has no root anywhere in [0,1], a
-    stronger statement than the count on (0,1) that subsection 4.4.3 quotes.
-    """
+    """Count real roots of ``p_expr(u_val, s)`` in [0,1], including both endpoints."""
     return sp.Poly(sp.expand(p_expr.subs(u, u_val)), s).count_roots(0, 1)
 
 
 def bernstein_1d(p_expr, var, lo, hi, m):
-    """Bernstein coefficients of degree ``m`` of ``p_expr`` on ``[lo,hi]``.
+    """Return degree-m Bernstein coefficients on [lo,hi].
 
-    The polynomial is first pulled back to the unit interval by
-    ``var = lo + (hi-lo)*v``.  If every returned coefficient is positive, then
-    the polynomial is positive on the whole interval.  The requested degree
-    must be a nonnegative integer at least as large as the pulled-back degree.
+    Use var = lo + (hi-lo)*v. The degree m must be a nonnegative
+    integer at least as large as the degree after substitution.
     """
     if not isinstance(m, (int, sp.Integer)) or m < 0:
         raise ValueError("the Bernstein degree must be a nonnegative integer")
@@ -268,18 +211,18 @@ def bernstein_1d(p_expr, var, lo, hi, m):
 # ----------------------------------------------------------------------
 # Symbols
 # ----------------------------------------------------------------------
-# e is the free parameter; t selects the slice (X,Z) = (1,t).
+# Parameters e and t at the normalized point (X,Z) = (1,t).
 # p, r are direction coordinates; xi is the univariate specialisation variable.
 e, t, p, r, xi = sp.symbols("e t p r xi", positive=True)
-# Primal variables of the power-cone barrier f_e.
+# Normalized coordinates of f_e in (4.3).
 X, Z = sp.symbols("X Z", positive=True)
 # u = e^2 and s = t^2 are the variables in which Pi_1 and Pi_2 are polynomials.
 u, s = sp.symbols("u s", positive=True)
-# q = 1 - s is the variable of the base-point certificates in Appendix B.2.
+# q = 1 - s in the base-point checks of Appendix B.2.
 q = sp.Symbol("q")
 
 A = e**2 + 3
-c = (1 - e)/2     # offset of the affine slice Z = c*t*p + r
+c = (1 - e)/2     # h_Z = c*t*p + r in the direction coordinates
 
 
 # ----------------------------------------------------------------------
@@ -294,24 +237,20 @@ fxxx, fxxz, fxzz, fzzz = D(fxx, X), D(fxx, Z), D(fxz, Z), D(fzz, Z)
 
 # Tangent direction h = p * d/dX + (c*t*p + r) * d/dZ.
 hX, hZ = p, c*t*p + r
-# The contractions that define the quadratic form Q and the cubic form P, and
-# the two self-concordance expressions used in subsection 4.3.
+# Directional derivatives and the forms G[h,h] and T_f[h,h,h].
 Df = fx*hX + fz*hZ                                    # <grad f, h>
 D2f = fxx*hX**2 + 2*fxz*hX*hZ + fzz*hZ**2             # D^2 f[h,h]
 D3f = fxxx*hX**3 + 3*fxxz*hX**2*hZ + 3*fxzz*hX*hZ**2 + fzzz*hZ**3
 Ghh = (fxx - fx**2)*hX**2 + 2*(fxz - fx*fz)*hX*hZ + (fzz - fz**2)*hZ**2
 Tfff = D3f - 6*D2f*Df + 4*Df**3
 
-# Recover Q and P of (4.7), (4.9) from G[h,h] and T_f[h,h,h] on (X,Z) = (1,t).
-# Remove the normalising factors of (4.6), (4.8), including the cubic minus
-# sign, by exact polynomial division with a zero-remainder check.
+# Recover Q and P using (4.6) and (4.8) at the normalized point (X,Z) = (1,t).
 Q_der = clear_denominator(Ghh.subs({X: 1, Z: t})*36*A**2*(1-t**2)**2/(9-e**2),
                           e, t, p, r)
 P_der = clear_denominator(Tfff.subs({X: 1, Z: t})
                           * (-54*A**3*(1-t**2)**3/(e*(9-e**2))), e, t, p, r)
 
-# Univariate specialisation p = 1, r = xi, and the polynomial
-# d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 whose discriminant drives the proof.
+# Set p = 1, r = xi in d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2.
 Q1 = sp.expand(Q_der.subs({p: 1, r: xi}))
 P1 = sp.expand(P_der.subs({p: 1, r: xi}))
 d = sp.expand(Q1**3 - P1**2)
@@ -325,8 +264,8 @@ d0 = sp.expand(sp.Rational(729, 2)*d.subs({e: sp.Rational(1, 3), t: sp.Rational(
 # Appendix A
 #   Pi_1(u,s) = sum_{j=0..6} a_j(u) s^j
 #   Pi_2(u,s) = sum_{j=0..9} b_j(u) s^j
-# The factors a_j, b_j are the compact forms printed in Appendix A, and their
-# product is matched against Disc_xi d_{e,t} under subsection 4.4.1.
+# Coefficients a_j and b_j of Appendix A.
+# The discriminant factorisation using Pi_1 and Pi_2 is checked in sec4_4_1.py.
 # ----------------------------------------------------------------------
 a = [-4*(u+3)**6,
      12*(u+3)**6,
@@ -351,14 +290,13 @@ Pi2 = sp.expand(sum(b[j]*s**j for j in range(10)))
 
 
 # ----------------------------------------------------------------------
-# Auxiliary factors of Appendix B
+# Auxiliary polynomials of Appendix B
 # (used by the Appendix B checks and by subsection 4.4.3)
 # ----------------------------------------------------------------------
 A6 = 1612*u**6 - 7822*u**5 + 35755*u**4 - 62928*u**3 + 62694*u**2 - 18954*u + 2187
 A7 = (46301*u**7 - 430305*u**6 + 715218*u**5 + 2010910*u**4
       - 7240815*u**3 + 31031667*u**2 - 12772080*u + 1679616)
-# R_7 and the three cubics h_0, h_1, h_2 of the base-point checks (Appendix B.2);
-# q = 1 - s is the variable in which h_0, h_1, h_2 are written.
+# Appendix B.2: R_7(s) and h_0(q), h_1(q), h_2(q), with q = 1-s.
 R7 = (38692*s**7 - 539840*s**6 + 3911572*s**5 - 14174132*s**4
       + 27167315*s**3 - 28286181*s**2 + 15176721*s - 3294172)
 h1 = 50379285*q**3 + 1563956*q**2 - 766260*q + 49923

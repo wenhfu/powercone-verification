@@ -1,16 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
 """
-Run all scripts in ``checks``, printing their summaries and recorded failures.
-Run a script directly for its detailed values and verdicts, e.g.
+Run all verification scripts, printing their summaries and recorded failures.
 
-    python checks/sec4_4_4.py
-
-Recorded check failures do not stop the remaining scripts.  The process exits
-with status 0 if all checks pass and status 1 if any fails.  Each completed
-script must report at least one check and leave no unreported checks.
-Unexpected exceptions or exits, missing reports and invalid reports abort the
-run with a nonzero status, writing the module name and captured output to
-stderr.  An aborted run has no grand total.
+Recorded failures do not stop later scripts. Unexpected errors abort the run
+and print the failing script's captured output. Exit status is 0 if all checks
+pass and nonzero otherwise.
 
 Run:  python run_all.py
 """

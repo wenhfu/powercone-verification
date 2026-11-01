@@ -2,32 +2,10 @@
 """
 Preliminary reductions in Section 4.4: the leading-coefficient polynomial L(u,s).
 
-Paper: Section 4.4, before Subsection 4.4.1, equations (4.13), (4.15), (4.17),
-(4.18), (4.20), (4.21).
-
-The leading coefficient of d_{e,t}(xi) = Q(1,xi)^3 - P(1,xi)^2 is
-
-    [xi^6] d_{e,t} = 576 L(u,s),       u = e^2,  s = t^2,
-
-L has bidegree (3,3); the binary sextic is Delta(p,r) = Q^3 - P^2.
-The Bernstein representation of L proves L > 0 on (0,1)^2.  The case t = 0
-(Lemma 4.2, (4.13)) is checked separately.
-
-What is verified here
----------------------
-* The two coefficients of (4.7) / (4.9) that are displayed again in this
-  subsection, [xi^2] Q(1,xi) and [xi^3] P(1,xi).
-* (4.13) : for t = 0 the identity
-               Delta(p,r) = 108 r^2 A^3 (A p^2 - 4 r^2)^2,
-           which is >= 0 because A = e^2 + 3 > 0 (Lemma 4.2).
-* (4.15) : the closed form of the leading coefficient.
-* (4.17) : [xi^6] d_{e,t} = 576 L(u,s) with u = e^2, s = t^2.
-* (4.18) : the power-basis expansion of L(u,s).
-* (4.20) : the 4 x 4 matrix of Bernstein coefficients of L, of degree 3 in each
-           variable.
-* (4.21) : L(u,s) > 0 on (0,1)^2.  Subtracting 81(1-u)^3 (the first row of the
-           Bernstein matrix, by the partition of unity) leaves a polynomial
-           whose Bernstein coefficients are the remaining rows, all >= 0.
+Checks the t = 0 identity (4.13), the leading coefficient and substitution
+in (4.15), (4.17), and the power-basis and Bernstein representations of L
+in (4.18), (4.20). Nonnegative Bernstein coefficients of L - 81(1-u)^3
+give L >= 81(1-u)^3 > 0 for 0<u,s<1, as in (4.21).
 
 Run:  python checks/sec4_4_0.py
 """
@@ -38,15 +16,10 @@ banner('Section 4.4', '(4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.
 
 
 def bern_coeffs(expr, du, ds):
-    """Bernstein coefficients of bidegree (du,ds) of ``expr`` on [0,1]^2.
+    """Return the Bernstein coefficient matrix of bidegree (du, ds) on [0,1]^2.
 
-    For a polynomial written in the power basis, the Bernstein coefficient of
-    bidegree (i,j) is
-
-        l_ij = sum_{k<=i, l<=j} a_kl * C(i,k)/C(du,k) * C(j,l)/C(ds,l).
-
-    Both requested degrees must be nonnegative integers and must bound the
-    degree of the polynomial in the corresponding variable.
+    Both degrees must be nonnegative integers at least as large as the
+    corresponding polynomial degrees.
     """
     if any(not isinstance(degree, (int, sp.Integer)) or degree < 0
            for degree in (du, ds)):
@@ -63,9 +36,7 @@ def bern_coeffs(expr, du, ds):
                 for k in range(i + 1) for l in range(j + 1)))
     return M
 
-# Closed forms transcribed from the paper: the leading coefficient as it is
-# written before L is introduced, the same quantity rewritten through L, and
-# the power-basis expansion of L(u,s).
+# (4.15), (4.17), (4.18): the leading coefficient and expressions for L.
 lead_pap = 64*((4*e**2*t**2+3*e**2+9)**3
                - 4*e**2*t**2*(9*(e**2+3)+t**2*(5*e**2-9))**2)
 L_expl = sp.expand(sp.Rational(1, 9)*((4*u*s+3*u+9)**3
@@ -75,8 +46,7 @@ L_pap = (81 + 81*u + 27*u**2 + 3*u**3
          + 216*u*s**2 - 24*u**3*s**2
          - 36*u*s**3 + 40*u**2*s**3 - 4*u**3*s**3)
 
-# The two coefficients of Q and P that the paper quotes again in this
-# subsection; the printed value is what SymPy computes from f_e.
+# Leading coefficients of Q(1,xi) and P(1,xi) in (4.7) and (4.9).
 print("[xi^2] Q(1,xi) =", sp.factor(Q1.coeff(xi, 2)))
 check("(4.7)   [xi^2] Q(1,xi)",
       is_zero(sp.expand(Q1.coeff(xi, 2) - 4*(4*e**2*t**2+3*e**2+9))))
@@ -85,9 +55,7 @@ check("(4.9)   [xi^3] P(1,xi)",
       is_zero(sp.expand(P1.coeff(xi, 3) + 16*e*t*(9*A+t**2*(5*e**2-9)))))
 print()
 
-# Lemma 4.2 / (4.13): the paper treats t = 0 separately.  For t = 0,
-# Delta(p,r) = Q(p,r)^3 - P(p,r)^2 factors with a squared cofactor, hence is
-# nonnegative as soon as A = e^2 + 3 > 0.
+# Lemma 4.2 / (4.13): Delta = 108 r^2 A^3 (A p^2 - 4 r^2)^2 when t = 0.
 Delta0 = sp.expand(sp.expand(Q_der**3 - P_der**2).subs(t, 0))
 print("Delta(p,r) at t = 0 =", sp.factor(Delta0))
 check("(4.13)   Delta(p,r) for t = 0",
@@ -96,14 +64,11 @@ check("(4.13)   Delta(p,r) >= 0 for t = 0   (Delta = 108 r^2 A^3 (square))",
       is_zero(sp.cancel(Delta0/(108*r**2*A**3)) - (A*p**2 - 4*r**2)**2))
 print()
 
-# (4.15): the leading coefficient of d_{e,t} in the paper's form, that is,
-# before the substitution u = e^2, s = t^2 is made.
+# (4.15): the leading coefficient before substituting u = e^2, s = t^2.
 check("(4.15)   [xi^6] d_{e,t}",
       is_zero(sp.expand(leading - lead_pap)))
 
-# (4.17): L is *defined* as [xi^6] d_{e,t} / 576.  Recompute it from the
-# monomials of the leading coefficient (only even powers occur), and compare it
-# both with the compact closed form and with the power-basis expansion.
+# (4.17): rewrite [xi^6] d_{e,t} / 576 using u = e^2, s = t^2.
 leading_terms = sp.Poly(leading, e, t).terms()
 if any(i % 2 or j % 2 for (i, j), co in leading_terms):
     raise ValueError("The leading coefficient must be even in both e and t")
@@ -125,9 +90,8 @@ ell_pap = sp.Matrix([[81, 81, 81, 81],
 print("Bernstein coefficients of L(u,s), m=3 in u and in s:")
 sp.pprint(ell)
 check("(4.20)   Bernstein coefficient matrix (l_ij)", (ell - ell_pap).is_zero_matrix)
-# (4.21): the first row sums to 81 B_0^(3)(u) = 81(1-u)^3 by partition of
-# unity.  Subtracting it leaves the other three rows, all nonnegative,
-# proving L >= 81(1-u)^3 > 0 for 0<u,s<1.
+# (4.21): L - 81(1-u)^3 has nonnegative Bernstein coefficients,
+# so L >= 81(1-u)^3 > 0 for 0<u,s<1.
 ell_rest = bern_coeffs(sp.expand(L_rec - 81*(1-u)**3), 3, 3)
 print("Bernstein coefficients of L(u,s) - 81(1-u)^3:")
 sp.pprint(ell_rest)
