@@ -1,24 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.4: real roots and strict positivity of d_{e,t}.
+subsection 4.4.4: the base-point polynomial d_0.
 
-Paper: subsection 4.4.4, equation (4.39).
-
-The base-point polynomial
-
-    d_0(xi) = (729/2) * d_{1/3,1/2}(xi)
-
-uses the positive scale 729/2, preserving signs and real roots.
-
-What is verified here
----------------------
-* The coefficients of d_0 against the explicit polynomial of (4.39).
-* Its constant term d_0(0) = 66199.
-
-Appendix C proves that d_0 has no real root.  The general family d_{e,t}
-additionally requires the nonzero leading coefficient, nonvanishing
-discriminant and root continuation argument of Section 4.4.4; the base-point
-Sturm certificate alone does not cover the full parameter domain.
+Checks d_0(xi) = (729/2) * d_{1/3,1/2}(xi) against (4.39),
+including d_0(0) = 66199. Its Sturm chain is checked in appendix_c.py.
 
 Run:  python checks/sec4_4_4.py
 """

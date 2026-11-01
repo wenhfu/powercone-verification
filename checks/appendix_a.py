@@ -1,29 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Appendix A: the explicit polynomial factors Pi_1 and Pi_2.
+Appendix A: exact polynomial factors Pi_1 and Pi_2.
 
-Paper: (4.22) and Appendix A.
-
-Disc_xi d_{e,t} factors as
-
-    2^44 3^27 s^3 (u-1)^3 (u+3)^15 (s-1)^15 Pi_1(u,s)^3 Pi_2(u,s),
-
-where
-
-    Pi_1(u,s) = sum_{j=0..6} a_j(u) s^j,
-    Pi_2(u,s) = sum_{j=0..9} b_j(u) s^j
-
-and the a_j, b_j are the compact factors displayed in Appendix A.
-
-What is displayed and checked here
-----------------------------------
-* Print the encoded coefficients a_0..a_6 and b_0..b_9 in ascending order,
-  factored as in Appendix A.
-* Eight checks cover degrees, extremal coefficients and values at s = 1.
-
-This script does not compare all 17 coefficients with independently encoded
-targets.  The full discriminant factorisation above is verified symbolically
-in (u,s) by sec4_4_1.py.
+Displays the coefficients a_0,...,a_6 and b_0,...,b_9 and checks
+the degrees, constant and leading coefficients, and values at s = 1.
+The full discriminant factorisation (4.22) is checked in sec4_4_1.py.
 
 Run:  python checks/appendix_a.py
 """
@@ -46,7 +27,7 @@ def show_named_factors(name, prefix, expr, var):
         print("   %s_%d(u) = %s" % (prefix, j, sp.factor(P.coeff_monomial(var**j))))
 
 
-# Coefficients of Pi_1 (degree 6 in s), together with the distinguished ones.
+# Appendix A: coefficients a_0,...,a_6 of Pi_1.
 show_named_factors("Pi_1(u,s) = sum_j a_j(u) s^j", "a", Pi1, s)
 check("Appendix A   deg_s Pi_1 = 6  (j = 0..6)",
       sp.Poly(Pi1, s).degree(s) == 6)
@@ -58,7 +39,7 @@ check("Appendix A   Pi_1(u,1) = u(u-1)^3(7u+9)^2",
       is_zero(Pi1.subs(s, 1) - u*(u-1)**3*(7*u+9)**2))
 print()
 
-# Coefficients of Pi_2 (degree 9 in s), together with the distinguished ones.
+# Appendix A: coefficients b_0,...,b_9 of Pi_2.
 show_named_factors("Pi_2(u,s) = sum_j b_j(u) s^j", "b", Pi2, s)
 check("Appendix A   deg_s Pi_2 = 9  (j = 0..9)",
       sp.Poly(Pi2, s).degree(s) == 9)

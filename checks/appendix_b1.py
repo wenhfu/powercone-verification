@@ -1,25 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Appendix B.1: positivity of the auxiliary factors A_6 and A_7.
+Appendix B.1: positivity of the auxiliary polynomials A_6 and A_7.
 
-Paper: Appendix B.1 (the definitions of A_6 and A_7, and the Bernstein
-coefficient lists that follow them).
-
-A_6 and A_7 are factors of Disc_s Pi_2 (subsection 4.4.3).  Positive Bernstein
-coefficients on each half of [0,1] certify their positivity.
-
-What is verified here
----------------------
-* The encoded power-basis coefficient lists of A_6(u) and A_7(u) are displayed
-  for comparison with Appendix B.1; they are not compared with a second set of
-  power-basis targets here.
-* The Bernstein coefficients of A_6(v/2), A_6((1+v)/2), A_7(v/2) and
-  A_7((1+v)/2), against the four lists printed in Appendix B.1.
-* Positivity of all four lists, proving A_6, A_7 > 0 on [0,1].
-
-The split at 1/2 produces positive Bernstein coefficients; neither polynomial
-vanishes there.  The factor 2u-1 in Disc_s Pi_2 separately determines the
-continuation intervals.
+Displays A_6 and A_7, checks the four Bernstein coefficient lists
+in Appendix B.1, and verifies A_6(u), A_7(u) > 0 on [0,1].
 
 Run:  python checks/appendix_b1.py
 """

@@ -2,29 +2,9 @@
 """
 subsection 4.4.1: factorisation of the discriminant of d_{e,t}.
 
-Paper: subsection 4.4.1, equation (4.22), together with the explicit factors
-Pi_1, Pi_2 of Appendix A.
-
-The proof of the upper bound rests on the factorisation
-
-    Disc_xi d_{e,t}
-        = 2^44 3^27 s^3 (u-1)^3 (u+3)^15 (s-1)^15 Pi_1(u,s)^3 Pi_2(u,s),
-
-where u = e^2, s = t^2 and Pi_1, Pi_2 are the polynomials of Appendix A.
-
-What is verified here
----------------------
-* The discriminant identity  Disc_xi d_{e,t} = -Res_xi(d, d') / [xi^6] d_{e,t}
-  for a sextic.
-* Evenness in e and t before replacing their squared powers by u and s,
-  together with an exact check by reverse substitution.
-* The exact factorisation of Disc_xi d_{e,t}, symbolically in (u,s), against
-  the right-hand side above.
-
-This is the most expensive computation of the suite, and the only place where
-the full discriminant factorization is checked.  The Appendix A script prints
-the encoded coefficient lists and checks degrees, extremal coefficients and
-boundary values; it does not independently compare every coefficient.
+Checks the factorisation (4.22) with Pi_1 and Pi_2 from Appendix A,
+the identity Disc_xi d = -Res_xi(d, d') / [xi^6] d,
+and the substitution u = e^2, s = t^2.
 
 Run:  python checks/sec4_4_1.py
 """
