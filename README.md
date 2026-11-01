@@ -1,26 +1,25 @@
 # Symbolic verification of the upper-bound argument
 
-The Python code verifies the algebraic identities and symbolic computations appearing in ***The optimal barrier parameter of the three-dimensional power cone***.
+This repository accompanies the manuscript:
 
-It covers subsections 4.3 and 4.4 and Appendices A-C of the upper-bound proof; the non-algebraic
-steps and the lower-bound argument are proved by hand in the paper and are out of scope here.
+> Rui-Jin Zhang, Wenhao Fu, and Yu-Hong Dai.  
+> *The optimal barrier parameter of the three-dimensional power cone*.
 
-## Requirements
+The scripts check the algebraic identities and certificates used in the
+upper-bound argument in Sections 4.3–4.4 and Appendices A–C.
 
-* Python 3; tested with Python **3.12.14**.
-* SymPy; tested with SymPy **1.14.0**.
+## Installation and Usage
 
-## How to run
+The code requires Python 3 (tested with Python **3.12.14**) and SymPy (tested with **1.14.0**).
 
-From the repository root (the directory containing this README and `run_all.py`), install the
-tested dependency and run all ten modules:
+From the repository root (the directory containing this README and `run_all.py`), install SymPy and run all ten verification modules:
 
 ```sh
 python -m pip install sympy==1.14.0
 python run_all.py
 ```
 
-From the same directory, run a single part of the paper with detailed output:
+To run an individual module with detailed output, use:
 
 ```sh
 python checks/sec4_3.py
@@ -28,23 +27,11 @@ python checks/sec4_3.py
 
 ## Output
 
-For each module, running it directly and through `run_all.py` executes the same checks.  The full
-runner executes all ten modules and normally prints only their summaries and recorded failure
-summaries; detailed computed values are suppressed in this mode, including those associated with
-recorded failures.
-
-Symbolic expressions, including the barrier's logarithms and symbolic powers, are manipulated and
-differentiated exactly.  The final algebraic verdicts use exact rational and polynomial arithmetic:
-polynomial normalisation, exact root counting, Bernstein coefficient signs, or remainder-checked
-division, without floating-point sampling.
-
-The examples and PASS table below show **expected results for the accompanying manuscript snapshot
-dated 2026-10-31**.  Equation numbers refer to that snapshot.
+All checks use exact symbolic arithmetic.
 
 ### Detailed output: a single script
 
-Running one script prints a banner naming the part of the paper and the equation numbers it checks,
-then the value SymPy computes for each ingredient, and one verdict per statement:
+Each script prints computed values and a `verified` or `FAILED` verdict for each check:
 
 ```
 ========================================================================
@@ -66,17 +53,11 @@ d_0(xi) = (729/2)*d_{1/3,1/2}(xi)   (degree 6 in xi):
 OVERALL [subsection 4.4.4]  PASS   (4.39)
 ```
 
-Each group of computed values or encoded coefficient lists is accompanied by a verdict identifying
-the relevant equation or appendix.  A verdict begins with `verified`, or with `FAILED` when its
-condition does not hold.  Printing an encoded list is not an independent comparison of every entry
-with the manuscript.  Each module's documentation distinguishes displayed inputs from the identities
-and certificates it checks.  The non-algebraic steps combining those ingredients remain the paper's
-own arguments.
+See each script's documentation for the scope of its checks.
 
 ### Summary output: run_all.py
 
-For completed scripts, `python run_all.py` prints each `OVERALL` line and any recorded failure
-summaries.  If every script completes its report, the runner then prints the grand total:
+A completed run of `run_all.py` prints a summary:
 
 ```
 ########################################################################
@@ -98,40 +79,9 @@ OVERALL [subsection 4.4.4]  PASS   (4.39)
 ########################################################################
 ```
 
-Both entry points exit with status `0` when all their checks pass and status `1` when a recorded
-check fails.  The full runner continues after recorded check failures so that its final summary
-includes every completed part.
-
-Unexpected exceptions or premature script exits abort the run with a nonzero status.  Before
-propagating the error, the runner writes the module name and all of that module's captured output to
-standard error, followed by the exception traceback.  An aborted run has no grand total.  Run a
-single script to inspect the detailed intermediate values of one part.
-
-Before replacing powers of `e` and `t` by powers of `u = e^2` and `s = t^2`, the leading-coefficient
-and discriminant checks explicitly verify that all exponents are even.  Both substitutions are also
-checked by exact reverse substitution.
-
-The tensor calculation separately rewrites coefficients whose exponents have the same parity using
-`u = e^2`, `s = t^2`, and `w = et`.  Each conversion explicitly checks this parity and verifies its
-reverse substitution, including under Python `-O`.  The Bernstein helpers reject requested degrees
-that are negative, nonintegral, or too small for the input polynomial.
-
 ## Scripts
 
-The table records expected results for the manuscript snapshot identified above.  The following
-scope distinctions are relevant when running modules separately:
-
-* `appendix_a.py` prints the 17 encoded coefficient polynomials of `Pi_1` and `Pi_2` and performs
-  eight checks of degrees, extremal coefficients, and boundary values.  It does not independently
-  compare all 17 entries with a second list.  `sec4_4_1.py` computes the sextic discriminant and
-  verifies its complete factorization involving those polynomials.
-* `appendix_b1.py` displays the encoded power-basis coefficients of `A_6` and `A_7`, recomputes
-  their Bernstein coefficients on two subintervals, compares the four reference lists, and checks
-  their positivity.  The subdivision obtains positive Bernstein certificates; the factor `2u-1`
-  in the discriminant of `Pi_2` separately determines the continuation intervals.
-* `sec4_4_4.py` verifies the base-point polynomial `d_0`; Appendix C establishes that it has no
-  real root.  The general conclusion for `d_{e,t}` also uses the nonvanishing leading coefficient
-  and discriminant and the paper's real-root continuation argument.
+The table lists the scripts and expected results; each script documents the checks it performs.
 
 | Script             | Part of the paper | Equations                                                    | Expected result |
 | ------------------ | ----------------- | ------------------------------------------------------------ | ------ |
