@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.3: the quadratic form Q and the cubic form P.
+Section 4.3: the quadratic form Q and the cubic form P.
 
 Derives Q and P from f_e by differentiation using (4.6) and (4.8),
 then checks the coefficients against (4.7) and (4.9).
@@ -10,7 +10,7 @@ Run:  python checks/sec4_3.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.3', '(4.7), (4.9)')
+banner('Section 4.3', '(4.7), (4.9)')
 
 
 def show_factor_coeffs(name, expr, *vars):
@@ -40,4 +40,4 @@ show_factor_coeffs("P(p,r) recomputed from T_f[h,h,h] of f_e", P_der, p, r)
 check("(4.9)   P(p,r)", is_zero(P_der - P_pap))
 print()
 
-report("subsection 4.3")
+report("Section 4.3")
