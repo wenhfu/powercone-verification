@@ -37,4 +37,4 @@ check("(4.22)   Disc_xi d_{e,t} factorisation, with Pi_1, Pi_2 of Appendix A",
       sp.expand(disc_us - claimed) == 0)
 print()
 
-report("subsection 4.4.1")
+report("Section 4.4.1")
