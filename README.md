@@ -35,7 +35,7 @@ Each script prints computed values and a `verified` or `FAILED` verdict for each
 
 ```
 ========================================================================
-Checking subsection 4.4.4: (4.39)
+Checking Section 4.4.4: (4.39)
 ========================================================================
 
 d_0(xi) = (729/2)*d_{1/3,1/2}(xi)   (degree 6 in xi):
@@ -50,7 +50,7 @@ d_0(xi) = (729/2)*d_{1/3,1/2}(xi)   (degree 6 in xi):
    verified   (4.39)   d_0(0) = 66199 > 0
 
 ========================================================================
-OVERALL [subsection 4.4.4]  PASS   (4.39)
+OVERALL [Section 4.4.4]  PASS   (4.39)
 ```
 
 See each script's documentation for the scope of its checks.
@@ -67,12 +67,12 @@ OVERALL [Appendix A]        PASS   (Pi_1, Pi_2 of (4.22), Appendix A)
 OVERALL [Appendix B.1]      PASS   (A_6, A_7 of (4.33), Appendix B.1)
 OVERALL [Appendix B.2]      PASS   (B.1)-(B.11)
 OVERALL [Appendix C]        PASS   (Sturm chain of d_0 of (4.39), Appendix C)
-OVERALL [subsection 4.3]    PASS   (4.7), (4.9)
+OVERALL [Section 4.3]    PASS   (4.7), (4.9)
 OVERALL [Section 4.4]       PASS   (4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21)
-OVERALL [subsection 4.4.1]  PASS   (4.22)
-OVERALL [subsection 4.4.2]  PASS   (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)
-OVERALL [subsection 4.4.3]  PASS   (4.32)-(4.34), (4.37)
-OVERALL [subsection 4.4.4]  PASS   (4.39)
+OVERALL [Section 4.4.1]  PASS   (4.22)
+OVERALL [Section 4.4.2]  PASS   (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)
+OVERALL [Section 4.4.3]  PASS   (4.32)-(4.34), (4.37)
+OVERALL [Section 4.4.4]  PASS   (4.39)
 
 ########################################################################
 # GRAND TOTAL: PASS
@@ -89,12 +89,12 @@ The table lists the scripts and expected results; each script documents the chec
 | `appendix_b1.py` | Appendix B.1      | $A_6$, $A_7$ of (4.33)                                   | PASS   |
 | `appendix_b2.py` | Appendix B.2      | (B.1)-(B.11)                                                 | PASS   |
 | `appendix_c.py`  | Appendix C        | Sturm chain of $d_0$ of (4.39)                              | PASS   |
-| `sec4_3.py`      | subsection 4.3    | (4.7), (4.9)                                                 | PASS   |
+| `sec4_3.py`      | Section 4.3    | (4.7), (4.9)                                                 | PASS   |
 | `sec4_4_0.py`    | Preliminary reductions in Section 4.4 | (4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21) | PASS   |
-| `sec4_4_1.py`    | subsection 4.4.1  | (4.22)                                                       | PASS   |
-| `sec4_4_2.py`    | subsection 4.4.2  | (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)                     | PASS   |
-| `sec4_4_3.py`    | subsection 4.4.3  | (4.32)-(4.34), (4.37)                                        | PASS   |
-| `sec4_4_4.py`    | subsection 4.4.4  | (4.39)                                                       | PASS   |
+| `sec4_4_1.py`    | Section 4.4.1  | (4.22)                                                       | PASS   |
+| `sec4_4_2.py`    | Section 4.4.2  | (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)                     | PASS   |
+| `sec4_4_3.py`    | Section 4.4.3  | (4.32)-(4.34), (4.37)                                        | PASS   |
+| `sec4_4_4.py`    | Section 4.4.4  | (4.39)                                                       | PASS   |
 
 ## License
 
