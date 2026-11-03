@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.4: the base-point polynomial d_0.
+Section 4.4.4: the base-point polynomial d_0.
 
 Checks d_0(xi) = (729/2) * d_{1/3,1/2}(xi) against (4.39),
 including d_0(0) = 66199. Its Sturm chain is checked in appendix_c.py.
@@ -10,7 +10,7 @@ Run:  python checks/sec4_4_4.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.4', '(4.39)')
+banner('Section 4.4.4', '(4.39)')
 
 # Compare the derived base-point polynomial with (4.39).
 show_coeffs("d_0(xi) = (729/2)*d_{1/3,1/2}(xi)", d0, xi)
@@ -20,4 +20,4 @@ check("(4.39)   d_0",
 check("(4.39)   d_0(0) = 66199 > 0", d0.subs(xi, 0) == 66199)
 print()
 
-report("subsection 4.4.4")
+report("Section 4.4.4")
