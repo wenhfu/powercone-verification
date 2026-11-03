@@ -67,12 +67,12 @@ OVERALL [Appendix A]        PASS   (Pi_1, Pi_2 of (4.22), Appendix A)
 OVERALL [Appendix B.1]      PASS   (A_6, A_7 of (4.33), Appendix B.1)
 OVERALL [Appendix B.2]      PASS   (B.1)-(B.11)
 OVERALL [Appendix C]        PASS   (Sturm chain of d_0 of (4.39), Appendix C)
-OVERALL [Section 4.3]    PASS   (4.7), (4.9)
+OVERALL [Section 4.3]       PASS   (4.7), (4.9)
 OVERALL [Section 4.4]       PASS   (4.7), (4.9), (4.13), (4.15), (4.17), (4.18), (4.20), (4.21)
-OVERALL [Section 4.4.1]  PASS   (4.22)
-OVERALL [Section 4.4.2]  PASS   (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)
-OVERALL [Section 4.4.3]  PASS   (4.32)-(4.34), (4.37)
-OVERALL [Section 4.4.4]  PASS   (4.39)
+OVERALL [Section 4.4.1]     PASS   (4.22)
+OVERALL [Section 4.4.2]     PASS   (4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)
+OVERALL [Section 4.4.3]     PASS   (4.32)-(4.34), (4.37)
+OVERALL [Section 4.4.4]     PASS   (4.39)
 
 ########################################################################
 # GRAND TOTAL: PASS
