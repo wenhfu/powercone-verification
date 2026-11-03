@@ -66,4 +66,4 @@ check("(4.37)   Pi_2(u,s) > 0 on (0,1)^2   (exact Sturm + Bernstein certificates
       all(pi2_ok))
 print()
 
-report("subsection 4.4.3")
+report("Section 4.4.3")
