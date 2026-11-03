@@ -1,4 +1,4 @@
-# Symbolic verification of the upper-bound argument
+# Symbolic verification of the upper-bound proof
 
 This repository accompanies the manuscript:
 
@@ -6,7 +6,7 @@ This repository accompanies the manuscript:
 > *The optimal barrier parameter of the three-dimensional power cone*.
 
 The scripts check the algebraic identities and certificates used in the
-upper-bound argument in Sections 4.3–4.4 and Appendices A–C.
+upper-bound proof in Sections 4.3–4.4 and Appendices A–C.
 
 ## Installation and Usage
 
