@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.1: factorisation of the discriminant of d_{e,t}.
+Section 4.4.1: factorisation of the discriminant of d_{e,t}.
 
 Checks the factorisation (4.22) with Pi_1 and Pi_2 from Appendix A,
 the identity Disc_xi d = -Res_xi(d, d') / [xi^6] d,
@@ -11,7 +11,7 @@ Run:  python checks/sec4_4_1.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.1', '(4.22)')
+banner('Section 4.4.1', '(4.22)')
 
 # For a polynomial of degree n with leading coefficient a_n one has
 # Disc = (-1)^{n(n-1)/2} Res(p, p') / a_n; here n = 6, so the sign is -1 and
