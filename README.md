@@ -22,7 +22,7 @@ python run_all.py
 To run an individual module with detailed output, use:
 
 ```sh
-python checks/sec4_3.py
+python checks/sec4_4_4.py
 ```
 
 ## Output
