@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 """
-subsection 4.4.2: the sign of Pi_1.
+Section 4.4.2: the sign of Pi_1.
 
 Checks the algebraic steps in Lemma 4.1 and (4.10), (4.24)-(4.25),
 (4.29)-(4.31). H is the trace-free part of T with respect to M.
@@ -14,7 +14,7 @@ Run:  python checks/sec4_4_2.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.2', '(4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)')
+banner('Section 4.4.2', '(4.10), Lemma 4.1, (4.24)-(4.25), (4.29)-(4.31)')
 
 # Auxiliary variable w = e*t.
 w = sp.Symbol("w", positive=True)
@@ -156,4 +156,4 @@ check("(4.31)   Pi_1(u,s) < 0 for 0<u,s<1   (||H||_M^2 > 0, R(u,s) > 0)",
       qpd and sp.expand(G(1, 1, 1) - D*(u+3)**3*(1 - s)**3) == 0)
 print()
 
-report("subsection 4.4.2")
+report("Section 4.4.2")
