@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-subsection 4.4.3: the sign of Pi_2.
+Section 4.4.3: the sign of Pi_2.
 
 Checks the boundary values (4.32), discriminant factorisation (4.33),
 and nonvanishing (4.34), together with exact root counts at
@@ -13,7 +13,7 @@ Run:  python checks/sec4_4_3.py
 from _common import *
 
 reset_marks()
-banner('subsection 4.4.3', '(4.32)-(4.34), (4.37)')
+banner('Section 4.4.3', '(4.32)-(4.34), (4.37)')
 
 # (4.32): the two boundary values of Pi_2, both printed factored.
 b0, b1 = Pi2.subs(s, 0), Pi2.subs(s, 1)
