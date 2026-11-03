@@ -291,7 +291,7 @@ Pi2 = sp.expand(sum(b[j]*s**j for j in range(10)))
 
 # ----------------------------------------------------------------------
 # Auxiliary polynomials of Appendix B
-# (used by the Appendix B checks and by subsection 4.4.3)
+# (used by the Appendix B checks and by Section 4.4.3)
 # ----------------------------------------------------------------------
 A6 = 1612*u**6 - 7822*u**5 + 35755*u**4 - 62928*u**3 + 62694*u**2 - 18954*u + 2187
 A7 = (46301*u**7 - 430305*u**6 + 715218*u**5 + 2010910*u**4
