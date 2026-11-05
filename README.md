@@ -1,9 +1,13 @@
 # Symbolic verification of the upper-bound proof
 
+[![DOI](https://img.shields.io/badge/DOI-10.48550%2FarXiv.2611.06404-blue)](https://doi.org/10.48550/arXiv.2611.06404)
+
 This repository accompanies the manuscript:
+
 
 > Rui-Jin Zhang, Wenhao Fu, and Yu-Hong Dai.  
 > *The optimal barrier parameter of the three-dimensional power cone*.
+> DOI: [10.48550/arXiv.2611.06404](https://doi.org/10.48550/arXiv.2611.06404)
 
 The scripts check the algebraic identities and certificates used in the
 upper-bound proof in Sections 4.3–4.4 and Appendices A–C.
